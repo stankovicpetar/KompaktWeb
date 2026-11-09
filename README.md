@@ -1,10 +1,11 @@
 # Kompakt Web — expanded edition
 
-## Deploy to Netlify
-1. Extract this ZIP. Upload the `kompaktweb` folder (the folder containing `index.html`) to Netlify, or connect it as a repository. No build command or installation is needed. Publish directory: `.`.
-2. Enable form detection under Forms in your Netlify site settings and deploy/redeploy. The static form is named `kontakt`, with the same field names in every language and a honeypot for spam protection.
-3. Configure submission notifications in Netlify if you want enquiries delivered to kompaktweb@gmail.com. A visible email address alone does not configure notifications.
-4. Submit one real enquiry on the deployed site and confirm that it appears in Forms. The success and failure UI was checked locally with mocked responses; actual Netlify delivery requires a deployed Netlify site.
+## Cloudflare Workers Static Assets
+The production site uses `wrangler.jsonc`: `src/index.js` handles `/api/*`, and `public/` contains the static assets. There is no frontend build step. Keep the existing production domain, bindings and secrets when deploying through the established Cloudflare workflow.
+
+The contact form posts JSON to `/api/contact`; `functions/api/contact.js` verifies Cloudflare Turnstile and integrates with Notion and Telegram. Legacy Netlify attributes in the HTML do not configure production delivery. Verify a real enquiry after an intentional deployment; never put private credentials in HTML or tracked files.
+
+Workers Static Assets currently redirects `.html` page requests to extensionless URLs and `index.html` to directory URLs. Canonical metadata, sitemap entries and navigation use those final URLs; keep the existing redirects. See [the November 9 SEO audit](docs/seo-audit-2026-11-09.md) for all 15 Search Console URL findings, Cloudflare instructions and post-deployment checks.
 
 ## Content and languages
 Serbian is the default at `/`. English is at `/en/`, Russian at `/ru/`. The language flags preserve the current page and section. Each local SVG flag has an accessible language name, so it renders consistently on Windows as well as mobile devices. Each language has complete static HTML, metadata, canonical and alternate language links; no translation API or automatic browser-language redirection is used.
@@ -37,7 +38,7 @@ Every HTML head, including all three thank-you pages, contains one Google tag fo
 
 Shared responsive styles allow grid children and form fields to shrink to the viewport, wrap long text and footer links, and reduce form padding on phones. Form text uses 16px on phones to avoid input-focus zoom. Turnstile uses its supported compact size so its verification UI fits narrow form containers. All 21 pages were checked in headless Edge at 320, 375, 390, 600, 768, 1024 and 1440px, including expanded navigation: 255 layout checks passed without horizontal overflow. This is browser emulation, not a physical iPhone or Android test.
 
-After deploying, confirm https://kompaktweb.rs is the primary Netlify domain, then submit https://kompaktweb.rs/sitemap.xml in the owner's Google Search Console account. No Search Console or Google Business Profile account was accessed or configured by this update.
+After deploying, verify the existing primary Cloudflare hostname https://kompaktweb.rs, then submit https://kompaktweb.rs/sitemap.xml in the owner's Google Search Console account. No Search Console or Google Business Profile account was accessed or configured by this update.
 
 ## Scroll reveals
 Sections, individual cards, process steps and FAQ items fade in once as they enter view, with a small stagger between siblings. The effect uses opacity and translation only and works independently of the 3D performance fallback. Reduced-motion and no-JavaScript visitors see content immediately.
@@ -53,7 +54,7 @@ Shared styling: `enhancements.css`, alongside original brand stylesheets. Shared
 External resources: Google Fonts, Google Analytics and Cloudflare Turnstile. System font fallbacks remain usable if fonts are unavailable. Existing social links, project destination and images were retained. Domain-based metadata assumes https://kompaktweb.rs.
 
 ## Verification
-Static local links/assets, translation coverage, 18 unique SEO titles/descriptions, reciprocal language URLs, structured data and sitemap coverage were checked. Simulated browser API tests covered device hints, reduced motion, deferred startup, the frame cap, manual/background pause, both runtime performance fallbacks, flag navigation, device controls and multilingual form success/failure handling. Browser visual QA was unavailable in this environment. A real form delivery test must be performed after deployment, with Netlify form detection enabled.
+Run `node scripts/verify-seo.mjs` to check local canonical metadata, reciprocal hreflang, structured data, sitemap coverage, robots.txt and internal links/assets. Historical checks covered translation coverage, 18 unique SEO titles/descriptions and simulated browser APIs for device hints, reduced motion, animation performance, navigation and multilingual form handling. For the November 9 audit, see the linked report for actual live HTTP observations and verification limits. Verify real contact delivery through Cloudflare Turnstile, Notion and Telegram after deployment.
 
 ## Limited launch offer
 The offer is 160 EUR reduced to 80 EUR for a five-page site, with 9 places
