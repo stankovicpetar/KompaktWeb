@@ -44,8 +44,12 @@ document.addEventListener("DOMContentLoaded", function () {
     return;
   }
 
+  let isSubmitting = false;
+
   form.addEventListener("submit", async function (event) {
     event.preventDefault();
+
+    if (isSubmitting || !form.reportValidity()) return;
 
     const fields = new FormData(form);
 
@@ -67,6 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
       turnstileToken: turnstileToken
     };
 
+    isSubmitting = true;
     button.disabled = true;
     status.textContent = messages.sending;
 
@@ -83,7 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return {};
       });
 
-      if (!response.ok || result.success !== true) {
+      if (!response.ok || result?.success !== true) {
         const errors = {
           400: messages.invalid,
           403: messages.securityFailed,
@@ -91,22 +96,23 @@ document.addEventListener("DOMContentLoaded", function () {
           503: messages.securityUnavailable
         };
         status.textContent = language === "sr"
-          ? result.error || "Slanje nije uspelo. Pokušajte ponovo."
+          ? result?.error || "Slanje nije uspelo. Pokušajte ponovo."
           : errors[response.status] || messages.error;
         return;
+      }
+
+      // Track a lead only after /api/contact confirms a successful submission.
+      try {
+        if (typeof window.fbq === "function") {
+          window.fbq("track", "Lead");
+        }
+      } catch (error) {
+        console.warn("Meta Pixel Lead tracking failed.", error);
       }
 
       status.textContent = messages.success;
 
       form.reset();
-
-      try {
-        if (typeof window.fbq === "function") {
-          window.fbq('track', 'Lead');
-        }
-      } catch (error) {
-        console.warn("Meta Pixel Lead tracking failed.", error);
-      }
 
     } catch (error) {
       status.textContent = language === "sr"
@@ -114,6 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
         : messages.error;
 
     } finally {
+      isSubmitting = false;
       button.disabled = false;
 
       if (
