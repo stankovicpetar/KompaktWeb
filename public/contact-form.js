@@ -100,6 +100,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
       form.reset();
 
+      try {
+        if (typeof window.fbq === "function") {
+          window.fbq('track', 'Lead');
+        }
+      } catch (error) {
+        console.warn("Meta Pixel Lead tracking failed.", error);
+      }
+
     } catch (error) {
       status.textContent = language === "sr"
         ? error.message || messages.error
