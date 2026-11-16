@@ -96,6 +96,8 @@ document.querySelectorAll('[data-device]').forEach(button=>button.addEventListen
 document.querySelectorAll('[data-plan]').forEach(a=>a.addEventListener('click',()=>{const select=document.querySelector('#package');if(select)select.value=a.dataset.plan;}));
 
 // One dismissible entry offer per tab session, across all language routes.
+const urlParams=new URLSearchParams(window.location.search);
+const dolaziSaReklame=urlParams.get('utm_campaign')==='kompaktweb_80eur';
 const offerDialog=document.querySelector('#offerDialog');
 if(offerDialog&&typeof offerDialog.showModal==='function'){
  const offerKey='kompakt-offer-80-v1';
@@ -112,7 +114,7 @@ if(offerDialog&&typeof offerDialog.showModal==='function'){
   offerDialog.classList.remove('visible');document.body.style.overflow=previousOverflow;
   if(previousFocus?.isConnected)previousFocus.focus({preventScroll:true});
  });
- if(!seen)setTimeout(()=>{
+ if(!seen&&!dolaziSaReklame)setTimeout(()=>{
   previousFocus=document.activeElement;previousOverflow=document.body.style.overflow;
   offerDialog.showModal();document.body.style.overflow='hidden';
   offerDialog.querySelector('[data-offer-close]')?.focus({preventScroll:true});
