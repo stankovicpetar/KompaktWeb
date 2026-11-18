@@ -111,3 +111,405 @@ body{overflow-wrap:anywhere}
   .nav .flags img{width:25px;height:17px}
   .nav-links.mobile-open{top:80px;max-height:calc(100dvh - 80px)}
 }
+
+/* ==========================================================================
+   Redesign, November 2026. Same brand colours (ink, signal green, amber, paper)
+   and the same section IDs. Typography, depth, rhythm and states are refined.
+   ========================================================================== */
+:root{
+  --body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --r-sm:6px;--r-md:12px;--r-lg:20px;
+  --shadow-tint:rgba(2,14,12,.55);
+  --glow:rgba(0,217,163,.16);
+}
+body{font-family:var(--body);line-height:1.65;font-feature-settings:"kern","liga"}
+/* Fine grain so large dark surfaces do not feel flat. */
+body::after{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+h1,h2,h3,.section-title{text-wrap:balance}
+p,li,.section-desc{text-wrap:pretty}
+.section-title{font-weight:600;letter-spacing:-.025em;line-height:1.1}
+h1.hero-title{letter-spacing:-.035em;line-height:1.02}
+.section-desc{max-width:60ch;line-height:1.75}
+.section-pad{padding:120px 0 136px}
+.eyebrow{letter-spacing:.12em}
+
+/* Buttons: readable sans text, tactile press, consistent radius. */
+.btn,.nav-cta{font-family:var(--body);font-weight:600;letter-spacing:-.005em;border-radius:var(--r-sm)}
+.btn{font-size:15px;padding:14px 24px;transition:background-color .22s ease,border-color .22s ease,color .22s ease,transform .22s ease,box-shadow .22s ease}
+.btn-primary{box-shadow:0 10px 26px -12px rgba(0,217,163,.55)}
+.btn-primary:hover{box-shadow:0 16px 34px -14px rgba(0,217,163,.7)}
+.btn:active,.nav-cta:active,.device-controls button:active{transform:translateY(1px) scale(.98)}
+.hero-actions .btn{font-size:14px}
+.nav-cta{font-size:13px;padding:10px 18px}
+.text-link{font-family:var(--body);font-weight:500;font-size:14px;transition:color .2s,border-color .2s,gap .2s}
+.text-link:hover{border-color:var(--signal);gap:26px}
+.dropdown-menu li a .dd-desc,.plan-note,.contact-detail,.footer-links a{font-family:var(--body)}
+.dropdown-menu{border-radius:var(--r-md);overflow:hidden;box-shadow:0 24px 50px -20px var(--shadow-tint)}
+
+/* Hero */
+.hero-sub{font-size:17px;line-height:1.75;max-width:56ch}
+.chip-star svg{width:30px;height:30px}
+.laptop-lid{box-shadow:12px 18px 0 -8px #0a3a30,0 30px 70px -10px var(--shadow-tint)}
+.floating-chip{border-radius:var(--r-md)}
+
+/* Statistics: sources are visible next to the numbers. */
+.benefit-stats .research-note{font:12.5px/1.8 var(--body);color:var(--paper-dim);opacity:.85;max-width:80ch;margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
+
+/* Index only: the three principles become an editorial list instead of three equal cards. */
+[data-page="index.html"] .why-grid{grid-template-columns:1fr;gap:0;background:none;border:0;border-bottom:1px solid var(--line)}
+[data-page="index.html"] .why-card{display:grid;grid-template-columns:150px minmax(0,1fr) minmax(0,1.35fr);gap:20px 48px;align-items:baseline;padding:40px 0 44px;background:transparent;border-top:1px solid var(--line);border-radius:0}
+[data-page="index.html"] .why-card:hover{transform:none;box-shadow:none}
+[data-page="index.html"] .why-card .why-num{margin:0;font-size:12px;letter-spacing:.06em}
+[data-page="index.html"] .why-card h3{font-size:clamp(22px,2.4vw,28px);font-weight:600;letter-spacing:-.02em;line-height:1.2;margin:0}
+[data-page="index.html"] .why-card p{font-size:16px;line-height:1.75;max-width:58ch;margin:0}
+[data-page="index.html"] .why-card::before{content:'';position:absolute;left:0;top:-1px;height:1px;width:0;background:var(--signal);transition:width .5s ease}
+[data-page="index.html"] .why-card:hover::before{width:100%}
+
+/* Responsive lab */
+.responsive-lab{border-radius:var(--r-lg);box-shadow:0 30px 60px -30px var(--shadow-tint)}
+.device-controls button{border-radius:var(--r-sm);font-family:var(--body);font-size:12px;font-weight:500;padding:8px 14px}
+.device-controls button:hover:not(.active){border-color:#00d9a366;color:var(--paper)}
+.demo-device{border-radius:10px}
+.demo-device[data-view=phone]{border-radius:20px}
+.demo-burger{display:inline-flex;flex-direction:column;gap:2px;vertical-align:middle}
+.demo-burger i{display:block;width:10px;height:1px;background:currentColor}
+.check-list li{font-size:15px;color:var(--paper)}
+
+/* Pricing: one framed table with a clearly lifted recommendation. */
+.plans{border-radius:var(--r-lg);overflow:hidden;box-shadow:0 30px 70px -40px var(--shadow-tint)}
+.plan:hover{transform:none;box-shadow:none;background:#1b212d}
+.plan.featured{background:linear-gradient(180deg,#0f2a26 0%,#161d24 55%);box-shadow:inset 0 0 0 1px var(--signal)}
+.plan.featured:hover{background:linear-gradient(180deg,#123029 0%,#182029 55%)}
+.plan.featured::before{border-radius:0 0 0 var(--r-sm);font-weight:500}
+.plan.featured .plan-price{color:var(--signal)}
+.plan-price{letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.plan-for,.plan-desc,.plan-features li{font-size:14.5px;line-height:1.6}
+.plan-note{font-size:12.5px}
+.plan-btn{margin-top:auto}
+
+/* "Not sure" section becomes a compact callout with its own action. */
+[data-page="index.html"] #projekti{padding:0 0 120px;border-bottom:0}
+[data-page="index.html"] #projekti .wrap{position:relative;display:flex;align-items:flex-end;justify-content:space-between;gap:32px 56px;flex-wrap:wrap;padding:48px 72px 52px}
+[data-page="index.html"] #projekti .wrap::before{content:'';position:absolute;inset:0 32px;border:1px solid var(--line);border-radius:var(--r-lg);background:radial-gradient(120% 140% at 100% 0%,#0a3a30 0%,transparent 55%),var(--ink-2)}
+[data-page="index.html"] #projekti .section-head,[data-page="index.html"] #projekti .btn{position:relative;z-index:1}
+[data-page="index.html"] #projekti .section-head{margin-bottom:0}
+[data-page="index.html"] #projekti .btn{flex-shrink:0}
+
+/* Real project: desktop screenshot with the matching phone view in front. */
+.work-preview{border-radius:var(--r-lg);transition:border-color .3s}
+.work-preview:hover{border-color:#00d9a366}
+.work-image{position:relative;overflow:visible}
+.work-image>.mini-browser{border-radius:10px 10px 0 0}
+.work-phone{position:absolute;right:5%;bottom:-38px;width:clamp(96px,15%,170px);padding:6px;background:#0b0f15;border:1px solid #4b6266;border-radius:22px;box-shadow:0 28px 60px -18px var(--shadow-tint);transform:rotate(3deg);transition:transform .6s ease;z-index:2}
+.work-phone img{width:100%;height:auto;border-radius:16px;transform:none!important}
+.work-preview:hover .work-phone{transform:rotate(0deg) translateY(-8px)}
+.work-caption{position:relative;padding:34px 30px 30px;align-items:flex-end}
+.work-caption>div{max-width:min(62ch,72%)}
+.work-caption p{font-size:15px;line-height:1.7}
+.work-arrow{transition:transform .3s}
+.work-preview:hover .work-arrow{transform:translate(4px,-4px)}
+
+/* Process: larger numbers give the steps a clear rhythm. */
+.process-step{font:500 clamp(30px,3.2vw,44px)/1 var(--display);letter-spacing:-.04em;color:var(--signal)}
+.process-step .line{display:none}
+.process-body h3{font-size:22px;letter-spacing:-.015em}
+.process-body p{font-size:16px;max-width:62ch}
+.process-item{padding:40px 0 44px}
+
+/* FAQ */
+.faq-list summary{font-size:17px;transition:color .2s}
+.faq-list summary:hover{color:var(--signal)}
+.faq-list p{font-size:15.5px;max-width:62ch}
+
+/* Nationwide service: heading left, text right. */
+[data-page="index.html"] .local-service .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:64px;align-items:end}
+[data-page="index.html"] .local-service .eyebrow,[data-page="index.html"] .local-service .section-title{grid-column:1}
+[data-page="index.html"] .local-service .section-desc{grid-column:2;grid-row:1/span 2;margin:0;font-size:17px}
+
+/* Offer and dialog: softer containers, tighter inner elements. */
+.launch-offer{border-radius:var(--r-lg);padding:40px;box-shadow:0 30px 70px -40px rgba(0,217,163,.35)}
+.offer-dialog{border-radius:var(--r-lg)}
+.offer-consultation{border-radius:0 var(--r-sm) var(--r-sm) 0}
+
+/* Contact and form */
+.contact-left h2{font-weight:600;letter-spacing:-.025em}
+.contact-left p{font-size:16.5px;line-height:1.75}
+.contact-detail{font-size:15px}
+.contact-detail a{border-bottom:1px solid #00d9a355;transition:color .2s,border-color .2s}
+.contact-detail a:hover{color:var(--signal);border-color:var(--signal)}
+.form{border-radius:var(--r-lg);padding:40px;box-shadow:0 30px 70px -40px var(--shadow-tint)}
+.field label{letter-spacing:.06em}
+.field input,.field select,.field textarea{border-radius:var(--r-sm);font-size:15.5px;transition:border-color .2s,box-shadow .2s}
+.field input:hover,.field select:hover,.field textarea:hover{border-color:rgba(242,239,232,.32)}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--signal);box-shadow:0 0 0 3px var(--glow)}
+.field input::placeholder,.field textarea::placeholder{color:#8a8d90}
+.formStatus{font-family:var(--body);font-size:14px;height:auto;min-height:20px}
+.form-submit{padding:16px 24px}
+
+.success-page{min-height:100dvh}
+
+@media(max-width:900px){
+  [data-page="index.html"] .why-card{grid-template-columns:1fr;gap:12px;padding:32px 0 36px}
+  [data-page="index.html"] .local-service .wrap{grid-template-columns:1fr}
+  [data-page="index.html"] .local-service .section-desc{grid-column:1;grid-row:auto;margin-top:20px}
+  .work-caption>div{max-width:none}
+}
+@media(max-width:600px){
+  .section-pad{padding:72px 0 84px}
+  .btn{font-size:14px}
+  .hero-sub{font-size:16px}
+  [data-page="index.html"] #projekti{padding-bottom:72px}
+  [data-page="index.html"] #projekti .wrap{padding:32px 44px 36px}
+  [data-page="index.html"] #projekti .wrap::before{inset:0 22px}
+  [data-page="index.html"] #projekti .btn{width:100%;justify-content:center}
+  .launch-offer{padding:26px}
+  .form{padding:26px 20px}
+  .work-phone{bottom:-24px;width:26%;padding:4px;border-radius:16px}
+  .work-phone img{border-radius:12px}
+  .work-caption{padding:34px 22px 24px}
+  .plans{border-radius:var(--r-md)}
+}
+@media(prefers-reduced-motion:reduce){.work-phone{transform:none!important}}
+
+/* ==========================================================================
+   Motion system, November 2026. Marketing site: subtle production polish,
+   crisp and fast for navigation and forms. Only transform and opacity move.
+   ========================================================================== */
+:root{
+  --ease-out:cubic-bezier(.23,1,.32,1);
+  --ease-in-out:cubic-bezier(.77,0,.175,1);
+  --dur-press:140ms;--dur-ui:200ms;--dur-reveal:640ms;
+}
+
+/* Scroll reveals: shorter travel, strong ease-out, siblings already staggered 65ms. */
+html.scroll-reveals .reveal{opacity:0;transform:translate3d(0,14px,0);transition:opacity var(--dur-reveal) var(--ease-out),transform var(--dur-reveal) var(--ease-out)!important;transition-delay:var(--reveal-delay,0ms)!important}
+html.scroll-reveals .reveal.in{opacity:1;transform:none}
+
+/* Hero: one orchestrated entrance instead of two stacked ones. */
+.hero-inner,.hero-art{animation:none!important}
+.hero-inner>.reveal:nth-child(1){--reveal-delay:0ms}
+.hero-inner>.reveal:nth-child(2){--reveal-delay:70ms}
+.hero-inner>.reveal:nth-child(3){--reveal-delay:140ms}
+.hero-inner>.reveal:nth-child(4){--reveal-delay:210ms}
+.hero-art.reveal{--reveal-delay:180ms}
+html.scroll-reveals .hero-art.reveal{transform:translate3d(0,10px,0) scale(.985)}
+html.scroll-reveals .hero-art.reveal.in{transform:none}
+
+/* Looping decoration removed: the lab demo and service heroes stay still. */
+.demo-shape div,.page-hero-inner>svg{animation:none!important}
+
+/* Buttons: explicit properties, quick press, slower release. */
+.btn,.nav-cta{transition:background-color var(--dur-ui) ease,border-color var(--dur-ui) ease,color var(--dur-ui) ease,box-shadow var(--dur-ui) ease,transform var(--dur-ui) var(--ease-out)}
+.btn:active,.nav-cta:active,.device-controls button:active,.plan-btn:active{transform:scale(.97);transition-duration:var(--dur-press)}
+.btn-primary:hover{transform:none}
+.btn-arrow,.text-link span,.work-arrow{display:inline-block;transition:transform var(--dur-ui) var(--ease-out)}
+.text-link{transition:color var(--dur-ui) ease,border-color var(--dur-ui) ease}
+.text-link:hover{gap:20px}
+.device-controls button{transition:background-color var(--dur-ui) ease,border-color var(--dur-ui) ease,color var(--dur-ui) ease,transform var(--dur-ui) var(--ease-out)}
+
+/* Underlines grow with transform instead of width. */
+.nav-links a::after{width:100%!important;transform:scaleX(0);transform-origin:left;transition:transform 240ms var(--ease-out)!important}
+[data-page="index.html"] .why-card::before{width:100%;transform:scaleX(0);transform-origin:left;transition:transform 520ms var(--ease-out)}
+
+/* Hover motion only for real pointers; touch taps do not trigger it. */
+.feature-card:hover,.why-card:hover{transform:none}
+@media (hover:hover) and (pointer:fine){
+  .btn-primary:hover{transform:translateY(-1px)}
+  .btn:hover .btn-arrow,.text-link:hover span{transform:translateX(3px)}
+  .work-preview:hover .work-arrow{transform:translate(3px,-3px)}
+  .nav-links a:hover::after{transform:scaleX(1)}
+  [data-page="index.html"] .why-card:hover::before{transform:scaleX(1)}
+  .feature-card:hover{transform:translateY(-4px)}
+  .work-preview:hover img{transform:translateY(0)}
+  .work-preview:hover .work-phone{transform:rotate(0deg) translateY(-6px)}
+}
+.feature-card{transition:transform 260ms var(--ease-out),border-color 260ms ease,box-shadow 260ms ease}
+.work-image>img{transition:transform 520ms var(--ease-out)}
+.work-phone{transition:transform 520ms var(--ease-out)}
+.work-preview:hover .work-arrow{transform:none}
+@media (hover:hover) and (pointer:fine){.work-preview:hover .work-arrow{transform:translate(3px,-3px)}}
+
+/* Desktop dropdown grows out of the Usluge trigger. */
+@media(min-width:1101px){
+  .dropdown-menu{transform-origin:top left;transform:translateY(-4px) scale(.97);transition:opacity 180ms var(--ease-out),transform 180ms var(--ease-out),visibility 180ms!important}
+  .nav-item.open .dropdown-menu{transform:none}
+}
+@media(min-width:1101px) and (hover:hover) and (pointer:fine){.nav-item:hover .dropdown-menu{transform:none}}
+.dropdown-trigger .caret{display:inline-block;transition:transform 200ms var(--ease-out)}
+
+/* Mobile menu: burger morphs into a close icon, the panel drops in from the header. */
+.burger{gap:6px}
+.burger span{transition:transform 240ms var(--ease-out),opacity 160ms ease;transform-origin:center}
+.burger[aria-expanded="true"] span:nth-child(1){transform:translateY(8px) rotate(45deg)}
+.burger[aria-expanded="true"] span:nth-child(2){opacity:0;transform:scaleX(.4)}
+.burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-8px) rotate(-45deg)}
+.nav-links.mobile-open{animation:menu-in 220ms var(--ease-out) both}
+.nav-links.mobile-open>li{animation:menu-item-in 260ms var(--ease-out) both}
+.nav-links.mobile-open>li:nth-child(2){animation-delay:30ms}
+.nav-links.mobile-open>li:nth-child(3){animation-delay:60ms}
+.nav-links.mobile-open>li:nth-child(4){animation-delay:90ms}
+.nav-links.mobile-open>li:nth-child(5){animation-delay:120ms}
+.nav-links.mobile-open>li:nth-child(6){animation-delay:150ms}
+.nav-links.mobile-open>li:nth-child(n+7){animation-delay:180ms}
+@keyframes menu-in{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@keyframes menu-item-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+/* FAQ: the plus turns into a minus and the answer settles in. */
+.faq-list summary::after{content:''!important;top:50%;right:2px;width:14px;height:2px;margin-top:-1px;background:var(--signal)}
+.faq-list summary::before{content:'';position:absolute;top:50%;right:8px;width:2px;height:14px;margin-top:-7px;background:var(--signal);transition:transform 220ms var(--ease-out),opacity 220ms ease}
+.faq-list details[open] summary::before{transform:rotate(90deg) scaleY(0);opacity:0}
+.faq-list details[open]>p{animation:faq-in 280ms var(--ease-out) both}
+@keyframes faq-in{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+
+/* Responsive lab: the device resize is the explanation, so it keeps a deliberate in-out curve. */
+.demo-device{transition:width 560ms var(--ease-in-out),height 560ms var(--ease-in-out),border-radius 560ms var(--ease-in-out)!important}
+
+/* Offer dialog: centred modal, scales up slightly from 0.96. Closing snaps. */
+.offer-dialog{transform:translateY(8px) scale(.96);transition:opacity 260ms var(--ease-out),transform 320ms var(--ease-out)}
+.offer-dialog.visible{transform:none}
+.offer-dialog::backdrop{animation:backdrop-in 260ms ease both}
+@keyframes backdrop-in{from{opacity:0}to{opacity:1}}
+
+/* Form fields respond quickly; status messages fade in. */
+.field input,.field select,.field textarea{transition:border-color 160ms ease,box-shadow 160ms ease}
+.formStatus:not(:empty){animation:status-in 240ms var(--ease-out) both}
+@keyframes status-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+/* Touch: no sticky hover offsets. Press feedback wins over the hover lift. */
+.work-preview:hover .work-image>img{transform:translateY(12px)}
+.work-preview:hover .work-phone{transform:rotate(3deg)}
+@media (hover:hover) and (pointer:fine){
+  .work-preview:hover .work-image>img{transform:translateY(0)}
+  .work-preview:hover .work-phone{transform:rotate(0deg) translateY(-6px)}
+}
+.btn.btn:active,.nav-cta.nav-cta:active{transform:scale(.97);transition-duration:var(--dur-press)}
+
+/* Functional UI motion must finish even when decorative animation is paused. */
+.motion-paused .nav-links.mobile-open,.motion-paused .nav-links.mobile-open>li,.motion-paused .faq-list details[open]>p,
+.motion-paused .formStatus:not(:empty),.motion-paused .offer-dialog::backdrop{animation-play-state:running!important}
+
+/* Reduced motion: no movement, but colour and opacity changes stay as gentle cues. */
+@media(prefers-reduced-motion:reduce){
+  html.scroll-reveals .reveal{opacity:1!important;transform:none!important;transition:none!important}
+  .nav-links.mobile-open,.nav-links.mobile-open>li,.faq-list details[open]>p,.formStatus:not(:empty){animation:fade-only 160ms ease both!important}
+  .offer-dialog{transform:none!important;transition:opacity 200ms ease!important}
+  .btn,.nav-cta,.text-link,.device-controls button,.field input,.field select,.field textarea,.faq-list summary,.flags a{transition-property:color,background-color,border-color,box-shadow,opacity!important;transition-duration:160ms!important}
+  .btn:active,.nav-cta:active,.device-controls button:active,.plan-btn:active{transform:none}
+  .burger span{transition:none!important}
+}
+@keyframes fade-only{from{opacity:0}to{opacity:1}}
+
+/* ==========================================================================
+   Hero scene: a website assembles itself (nav, headline, copy, image, cards),
+   the cursor presses the button, then the same page appears on a phone.
+   Base styles are the finished page; the .run class only adds the entrance.
+   Paused, reduced-motion and low-power visitors see the finished page.
+   ========================================================================== */
+.hero-art .scene{transform:none!important}
+.build{position:absolute;inset:0}
+.build-window{position:absolute;left:5%;top:12%;width:76%;container-type:inline-size;border:1px solid #2f3b44;border-radius:12px;overflow:hidden;background:#10141c;
+  box-shadow:12px 16px 0 -8px #0a3a30,0 34px 70px -24px var(--shadow-tint)}
+.build-window>.mini-browser{padding:9px 12px}
+.build-page{padding:5cqw 5cqw 5.5cqw;transition:opacity 380ms ease}
+.bp-nav{display:flex;align-items:center;justify-content:space-between}
+.bp-logo{display:block;width:13cqw;height:2.2cqw;border-radius:1cqw;background:var(--paper);opacity:.85}
+.bp-links{display:flex;gap:2.6cqw}
+.bp-links i{display:block;width:6.5cqw;height:1.3cqw;border-radius:1cqw;background:#f2efe840}
+.bp-hero{display:grid;grid-template-columns:1.3fr 1fr;gap:5cqw;align-items:center;margin-top:6cqw}
+.bp-copy{position:relative;min-width:0}
+.bp-label{display:block;font:500 2.2cqw/1 var(--mono);letter-spacing:.14em;color:var(--signal)}
+.bp-h{display:block;margin-top:2.6cqw;font:700 7.4cqw/1.02 var(--display);letter-spacing:-.03em;color:var(--paper)}
+.bp-h span,.bp-h em{display:block}
+.bp-h em{font-style:normal;color:var(--signal)}
+.bp-line{display:block;height:1.1cqw;width:92%;margin-top:3cqw;border-radius:1cqw;background:#c9c6bd40}
+.bp-line.bp-short{width:62%;margin-top:1.8cqw}
+.bp-cta{position:relative;display:block;width:23cqw;height:5.6cqw;margin-top:4cqw;border-radius:1.2cqw;background:var(--signal);box-shadow:0 1.6cqw 3.6cqw -1.6cqw #00d9a3aa}
+.bp-cta::after{content:'';position:absolute;inset:-1px;border-radius:inherit;border:1px solid var(--signal);opacity:0;pointer-events:none}
+.bp-cursor{position:absolute;left:62%;top:58%;width:5.4cqw;opacity:0;pointer-events:none;filter:drop-shadow(0 1px 2px #0008)}
+.bp-cursor svg{display:block;width:100%;height:auto}
+.bp-media{position:relative;display:block;aspect-ratio:4/5;border-radius:2cqw;overflow:hidden;
+  background:radial-gradient(circle at 70% 26%,var(--amber) 0 9%,transparent 9.5%),linear-gradient(165deg,#0f2f2a 0%,#0e4a40 55%,#00b588 120%)}
+.bp-media::before{content:'';position:absolute;left:-10%;right:-10%;bottom:-6%;height:46%;background:#10141c;border-radius:50% 60% 0 0;opacity:.75}
+.bp-media::after{content:'';position:absolute;left:30%;right:-20%;bottom:-10%;height:38%;background:#0a3a30;border-radius:60% 40% 0 0}
+.bp-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:3cqw;margin-top:6cqw}
+.bp-cards i{display:block;height:9cqw;border-radius:1.6cqw;border:1px solid #00d9a333;background:#00d9a30d}
+
+.build-phone-slot{position:absolute;right:3%;top:38%;width:23%;transition:opacity 380ms ease}
+.build-phone{container-type:inline-size;aspect-ratio:9/18.5;padding:5%;background:#0b0f15;border:1px solid #4b6266;border-radius:16%/8%;
+  box-shadow:0 30px 60px -20px var(--shadow-tint)}
+.bp-phone-screen{height:100%;padding:12cqw 9cqw;border-radius:12%/6%;background:#10141c;overflow:hidden}
+.bp-phone-screen .bp-logo{width:34cqw;height:5cqw;border-radius:3cqw}
+.bp-phone-screen .bp-h{margin-top:14cqw;font-size:15cqw}
+.bp-phone-screen .bp-line{height:3cqw;margin-top:8cqw}
+.bp-phone-screen .bp-cta{width:56cqw;height:13cqw;margin-top:9cqw;border-radius:3cqw}
+.bp-phone-screen .bp-media{aspect-ratio:auto;height:52cqw;margin-top:12cqw;border-radius:5cqw}
+
+/* Reset between loops: the finished page fades out quietly, then rebuilds. */
+.build.reset .build-page,.build.reset .build-phone-slot{opacity:0}
+
+/* Entrance choreography, about 3 s, played only while .run is set. */
+.build.run .bp-nav{animation:b-down 420ms var(--ease-out) both!important}
+.build.run .build-window .bp-label{animation:b-rise 460ms var(--ease-out) 240ms both!important}
+.build.run .build-window .bp-h>*{animation:b-rise 560ms var(--ease-out) both!important}
+.build.run .build-window .bp-h>:nth-child(1){animation-delay:360ms!important}
+.build.run .build-window .bp-h>:nth-child(2){animation-delay:460ms!important}
+.build.run .build-window .bp-h>:nth-child(3){animation-delay:560ms!important}
+.build.run .build-window .bp-line{animation:b-draw 560ms var(--ease-in-out) 820ms both!important}
+.build.run .build-window .bp-line.bp-short{animation-delay:900ms!important}
+.build.run .build-window .bp-media{animation:b-wipe 760ms var(--ease-in-out) 620ms both!important}
+.build.run .build-window .bp-cta{animation:b-pop 380ms var(--ease-out) 1080ms both,b-press 240ms ease 2440ms forwards!important}
+.build.run .build-window .bp-cta::after{animation:b-ring 620ms var(--ease-out) 2440ms forwards!important}
+.build.run .bp-cards i{animation:b-rise 440ms var(--ease-out) both!important}
+.build.run .bp-cards i:nth-child(1){animation-delay:1220ms!important}
+.build.run .bp-cards i:nth-child(2){animation-delay:1280ms!important}
+.build.run .bp-cards i:nth-child(3){animation-delay:1340ms!important}
+.build.run .bp-cursor{animation:b-cursor 1300ms var(--ease-in-out) 1500ms both!important}
+.build.run .build-phone{animation:b-phone 680ms var(--ease-out) 2700ms both!important}
+
+@keyframes b-down{from{opacity:0;transform:translateY(-6px)}}
+@keyframes b-rise{from{opacity:0;transform:translateY(10px);filter:blur(4px)}}
+@keyframes b-draw{from{clip-path:inset(0 100% 0 0)}}
+@keyframes b-wipe{from{clip-path:inset(100% 0 0 0 round 2cqw)}}
+@keyframes b-pop{from{opacity:0;transform:scale(.9)}}
+@keyframes b-press{0%{transform:none}45%{transform:scale(.93)}100%{transform:none}}
+@keyframes b-ring{from{opacity:.7;transform:scale(1)}to{opacity:0;transform:scale(1.35,1.9)}}
+@keyframes b-cursor{0%{opacity:0;transform:translate(260%,240%)}18%{opacity:1}72%{transform:none}82%{transform:scale(.86)}92%,100%{opacity:1;transform:none}}
+@keyframes b-phone{from{opacity:0;transform:translateY(28px)}}
+
+/* Paused mid-way: show the finished page instead of a frozen half-built one. */
+.motion-paused .build *,.performance-static .build *{animation:none!important}
+
+/* Background sphere and orbits: visible, slow, and pausable. */
+#world{opacity:.9}
+.world-static{opacity:.75}
+.orbit{border-color:#00d9a340}
+.orbit-one{animation:orbit-one 90s linear infinite}
+.orbit-two{animation:orbit-two 60s linear infinite}
+@keyframes orbit-one{from{transform:rotate(-28deg)}to{transform:rotate(-388deg)}}
+@keyframes orbit-two{from{transform:rotate(38deg)}to{transform:rotate(398deg)}}
+
+@media(max-width:900px){.build-window{left:3%;width:80%}.build-phone-slot{right:1%;width:24%}}
+@media(max-width:600px){.build-window{top:10%;left:2%;width:82%;border-radius:10px}.build-window>.mini-browser{padding:7px 10px}.build-phone-slot{top:42%;right:0;width:25%}}
+
+/* FAQ accordion: height is animated by experience.js; content fades as it closes. */
+.faq-list details.closing>p{animation:none!important;opacity:0;transform:translateY(-4px);transition:opacity 160ms ease,transform 200ms var(--ease-out)}
+.faq-list details.closing summary::before{transform:none;opacity:1}
+.faq-list details[open] summary{color:var(--signal)}
+.faq-list summary{transition:color 200ms ease}
+
+/* "Niste sigurni" callout gets breathing room from the pricing above. */
+[data-page="index.html"] #projekti{padding-top:88px}
+@media(max-width:600px){[data-page="index.html"] #projekti{padding-top:48px}}
+
+@media(prefers-reduced-motion:reduce){
+  .orbit{animation:none!important}
+  .build *{animation:none!important}
+}
+/* The build scene is light CSS, so it may run on low-power devices; JS stops it when paused. */
+.motion-paused .build.run *,.motion-paused .build.run *::after{animation-play-state:running!important}
+/* FAQ answer fade is part of the accordion, so it also plays in static mode. */
+.performance-static .faq-list details[open]>p{animation:faq-in 280ms var(--ease-out) both!important}
+.performance-static .faq-list details.closing>p{animation:none!important;transition:opacity 160ms ease,transform 200ms var(--ease-out)!important}
+.performance-static .faq-list summary::before{transition:transform 220ms var(--ease-out),opacity 220ms ease!important}
+@media(prefers-reduced-motion:reduce){.performance-static .faq-list details[open]>p{animation:fade-only 160ms ease both!important}}
