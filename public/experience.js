@@ -30,7 +30,7 @@ function constrainedDevice(){
 let storedStatic=false;
 try{storedStatic=sessionStorage.getItem('kompakt-static-mode')==='1';}catch{}
 let performanceLimited=constrainedDevice()||storedStatic;
-let userPaused=reduce.matches,paused=userPaused||performanceLimited,worldController=null;
+let userPaused=reduce.matches,paused=userPaused||performanceLimited,worldController=null,buildSync=null;
 let initScheduled=false,loaded=document.readyState==='complete';
 const toggle=document.querySelector('.motion-toggle');
 const staticLabels={sr:'Statičan prikaz radi boljih performansi',en:'Static view for better performance',ru:'Статичный режим для быстрой работы'};
@@ -39,8 +39,10 @@ function setMotion(){
  document.documentElement.classList.toggle('motion-paused',paused);
  document.documentElement.classList.toggle('performance-static',performanceLimited);
  document.querySelectorAll('svg').forEach(svg=>{if(paused)svg.pauseAnimations?.();else svg.unpauseAnimations?.();});
- if(toggle){toggle.disabled=performanceLimited;toggle.textContent=performanceLimited?staticLabels[lang]:(paused?messages.resume:messages.pause);toggle.setAttribute('aria-pressed',String(paused));}
+ // The hero scene can still play in static mode, so the toggle always stays usable.
+ if(toggle){toggle.disabled=false;toggle.textContent=userPaused?messages.resume:messages.pause;toggle.setAttribute('aria-pressed',String(userPaused));}
  worldController?.sync();
+ buildSync?.();
 }
 function lockStatic(reason){
  if(performanceLimited)return;
@@ -49,7 +51,7 @@ function lockStatic(reason){
  setMotion();worldController?.destroy();
 }
 setMotion();
-toggle?.addEventListener('click',()=>{if(performanceLimited)return;userPaused=!userPaused;setMotion();startWhenIdle();});
+toggle?.addEventListener('click',()=>{userPaused=!userPaused;setMotion();startWhenIdle();});
 reduce.addEventListener('change',()=>{userPaused=reduce.matches;setMotion();startWhenIdle();});
 connection?.addEventListener?.('change',()=>{if(constrainedDevice())lockStatic('device-or-connection');});
 document.documentElement.classList.add('scroll-reveals');
@@ -146,7 +148,7 @@ function createWorld(){
    const xx=x*ca+z*sa,zz=z*ca-x*sa,yy=y*Math.cos(tilt)-zz*Math.sin(tilt),depth=y*Math.sin(tilt)+zz*Math.cos(tilt),p=3.5/(3.5-depth*.6);
    return[width/2+xx*size*p,height/2+yy*size*p,depth];
   });
-  edges.forEach(([a,b])=>{const p=points[a],q=points[b],depth=(p[2]+q[2])/2;ctx.strokeStyle=`rgba(0,217,163,${.06+(depth+1)*.09})`;ctx.lineWidth=.6;ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.stroke();});
+  edges.forEach(([a,b])=>{const p=points[a],q=points[b],depth=(p[2]+q[2])/2;ctx.strokeStyle=`rgba(0,217,163,${.08+(depth+1)*.15})`;ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.stroke();});
  }
  function tick(t){
   raf=0;if(stopped||paused||!visible||document.hidden)return;
@@ -157,7 +159,7 @@ function createWorld(){
    windowStart=t;samples=0;slowFrames=0;
   }
   if(!lastDraw||t-lastDraw>=32){
-   const start=performance.now();angle+=Math.min(lastDraw?t-lastDraw:32,80)*.00008;render();lastDraw=t;
+   const start=performance.now();angle+=Math.min(lastDraw?t-lastDraw:32,80)*.00022;render();lastDraw=t;
    expensiveDraws=performance.now()-start>8?expensiveDraws+1:0;
    if(expensiveDraws>=4){lockStatic('render-budget');return;}
   }
@@ -191,5 +193,50 @@ function startWhenIdle(){
 }
 window.addEventListener('load',()=>{loaded=true;startWhenIdle();},{once:true});
 startWhenIdle();
+
+// Hero scene: the page builds itself, holds, fades out quietly and rebuilds.
+// It only runs while visible and animated; otherwise the finished page shows.
+const build=document.querySelector('[data-build]');
+if(build){
+ const cycle=9000,fade=420;let timer=0,running=false,inView=false;
+ // Light CSS only: runs on low-power devices too, but not when paused, reduced, saving data or after a slow-frame fallback.
+ const canRun=()=>inView&&!userPaused&&!reduce.matches&&!document.hidden&&!connection?.saveData&&!document.documentElement.dataset.motionFallback;
+ function stop(){clearTimeout(timer);running=false;build.classList.remove('run','reset');}
+ function play(){
+  clearTimeout(timer);if(!canRun()){stop();return;}
+  running=true;build.classList.remove('run','reset');void build.offsetWidth;build.classList.add('run');
+  timer=setTimeout(()=>{if(!canRun()){stop();return;}build.classList.add('reset');timer=setTimeout(play,fade);},cycle-fade);
+ }
+ buildSync=()=>{if(canRun()){if(!running)play();}else if(running)stop();};
+ if('IntersectionObserver'in window)new IntersectionObserver(e=>{inView=e[0].isIntersecting;buildSync();},{threshold:.25}).observe(build);
+ else{inView=true;buildSync();}
+ document.addEventListener('visibilitychange',buildSync);
+}
+
+// FAQ accordion: animate height on open and close; interruptible mid-way.
+const faqEase='cubic-bezier(.23,1,.32,1)';
+document.querySelectorAll('.faq-list details').forEach(details=>{
+ const summary=details.querySelector('summary');if(!summary||!details.animate)return;
+ let anim=null;
+ const closedHeight=()=>{const cs=getComputedStyle(details);return summary.getBoundingClientRect().height+parseFloat(cs.paddingTop)+parseFloat(cs.paddingBottom)+parseFloat(cs.borderTopWidth)+parseFloat(cs.borderBottomWidth);};
+ const finish=()=>{anim=null;details.style.overflow='';details.classList.remove('closing');};
+ summary.addEventListener('click',event=>{
+  if(reduce.matches)return;
+  event.preventDefault();
+  const start=details.getBoundingClientRect().height;
+  const closing=details.open&&!details.classList.contains('closing');
+  anim?.cancel();details.style.overflow='hidden';
+  if(closing){
+   details.classList.add('closing');
+   anim=details.animate({height:[start+'px',closedHeight()+'px']},{duration:240,easing:faqEase});
+   anim.onfinish=()=>{details.open=false;finish();};
+  }else{
+   details.classList.remove('closing');details.open=true;
+   const end=details.getBoundingClientRect().height;
+   anim=details.animate({height:[start+'px',end+'px']},{duration:340,easing:faqEase});
+   anim.onfinish=finish;
+  }
+ });
+});
 
 })();
