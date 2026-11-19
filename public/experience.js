@@ -254,13 +254,32 @@ if(offerCard&&'IntersectionObserver'in window){
 
 // Packages and offer: the border lights up where the pointer is (mouse only).
 // --px/--py are registered in CSS, so the light glides between positions.
-document.querySelectorAll('.plan,.launch-offer').forEach(card=>{
+document.querySelectorAll('.plan,.launch-offer,.responsive-lab').forEach(card=>{
  card.addEventListener('pointermove',e=>{
   if(e.pointerType!=='mouse'||reduce.matches)return;
   const r=card.getBoundingClientRect();
   card.style.setProperty('--px',(e.clientX-r.left).toFixed(0)+'px');card.style.setProperty('--py',(e.clientY-r.top).toFixed(0)+'px');
  },{passive:true});
 });
+
+// Responsive lab: on hover the demo device tilts gently toward the pointer.
+// The transform is set on the device itself and eased each frame.
+const lab=document.querySelector('.responsive-lab'),labDevice=lab?.querySelector('.demo-device');
+if(lab&&labDevice){
+ let tx=0,ty=0,x=0,y=0,raf=0;
+ const step=()=>{
+  x+=(tx-x)*.1;y+=(ty-y)*.1;
+  labDevice.style.transform=Math.abs(x)+Math.abs(y)<.01&&!tx&&!ty?'':`rotateX(${y.toFixed(2)}deg) rotateY(${x.toFixed(2)}deg) translateZ(0)`;
+  raf=Math.abs(tx-x)+Math.abs(ty-y)>.01?requestAnimationFrame(step):0;
+ };
+ lab.addEventListener('pointermove',e=>{
+  if(e.pointerType!=='mouse'||reduce.matches||userPaused)return;
+  const r=lab.getBoundingClientRect();
+  tx=((e.clientX-r.left)/r.width-.5)*14;ty=-((e.clientY-r.top)/r.height-.5)*10;
+  if(!raf)raf=requestAnimationFrame(step);
+ },{passive:true});
+ lab.addEventListener('pointerleave',()=>{tx=0;ty=0;if(!raf)raf=requestAnimationFrame(step);});
+}
 
 // FAQ accordion: animate height on open and close; interruptible mid-way.
 const faqEase='cubic-bezier(.23,1,.32,1)';
