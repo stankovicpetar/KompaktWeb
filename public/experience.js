@@ -38,6 +38,7 @@ function setMotion(){
  paused=userPaused||performanceLimited;
  document.documentElement.classList.toggle('motion-paused',paused);
  document.documentElement.classList.toggle('performance-static',performanceLimited);
+ document.documentElement.classList.toggle('user-paused',userPaused);
  document.querySelectorAll('svg').forEach(svg=>{if(paused)svg.pauseAnimations?.();else svg.unpauseAnimations?.();});
  // The hero scene can still play in static mode, so the toggle always stays usable.
  if(toggle){toggle.disabled=false;toggle.textContent=userPaused?messages.resume:messages.pause;toggle.setAttribute('aria-pressed',String(userPaused));}
@@ -359,8 +360,8 @@ document.querySelectorAll('.feature-card,.status-panel,.terminal-panel,.device-r
 // Portfolio page: the project preview responds to the mouse with depth.
 // The desktop screenshot leans a little, the phone moves further (parallax),
 // and a soft light follows the cursor. Eased per frame; mouse only.
-document.querySelectorAll('.project-visual').forEach(visual=>{
- const desk=visual.querySelector('.device-desktop'),phone=visual.querySelector('.device-mobile');
+document.querySelectorAll('.project-visual,.site-demo').forEach(visual=>{
+ const desk=visual.querySelector('.device-desktop,.sd-browser'),phone=visual.querySelector('.device-mobile,.sd-phone');
  if(!desk)return;
  let tx=0,ty=0,x=0,y=0,raf=0;
  const step=()=>{
