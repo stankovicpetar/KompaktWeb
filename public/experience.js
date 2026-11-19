@@ -38,6 +38,7 @@ function setMotion(){
  paused=userPaused||performanceLimited;
  document.documentElement.classList.toggle('motion-paused',paused);
  document.documentElement.classList.toggle('performance-static',performanceLimited);
+ document.documentElement.classList.toggle('user-paused',userPaused);
  document.querySelectorAll('svg').forEach(svg=>{if(paused)svg.pauseAnimations?.();else svg.unpauseAnimations?.();});
  // The hero scene can still play in static mode, so the toggle always stays usable.
  if(toggle){toggle.disabled=false;toggle.textContent=userPaused?messages.resume:messages.pause;toggle.setAttribute('aria-pressed',String(userPaused));}
@@ -59,7 +60,13 @@ const reveals=document.querySelectorAll('.reveal');
 if(!reduce.matches&&'IntersectionObserver'in window){const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:0,rootMargin:'0px 0px -32px 0px'});reveals.forEach(e=>io.observe(e));}else reveals.forEach(e=>e.classList.add('in'));
 const progress=document.createElement('div');progress.className='scroll-progress';document.body.append(progress);
 let scrollQueued=false;
-function scrollUpdate(){const d=document.documentElement;progress.style.transform=`scaleX(${d.scrollHeight>d.clientHeight?d.scrollTop/(d.scrollHeight-d.clientHeight):0})`;document.querySelector('header')?.style.setProperty('border-bottom-color',scrollY>10?'#00d9a340':'#f2efe817');scrollQueued=false;}
+// Page height is cached (updated on resize and when the body changes size) and
+// the header colour is written only when it changes, not on every scroll frame.
+const headerEl=document.querySelector('header');let scrollRange=1,headerScrolled=null;
+const measureScroll=()=>{const d=document.documentElement;scrollRange=Math.max(1,d.scrollHeight-d.clientHeight);};
+measureScroll();window.addEventListener('resize',measureScroll,{passive:true});window.addEventListener('load',measureScroll);
+if('ResizeObserver'in window)new ResizeObserver(measureScroll).observe(document.body);
+function scrollUpdate(){progress.style.transform=`scaleX(${Math.min(1,scrollY/scrollRange)})`;const scrolled=scrollY>10;if(scrolled!==headerScrolled){headerScrolled=scrolled;headerEl?.style.setProperty('border-bottom-color',scrolled?'#00d9a340':'#f2efe817');}scrollQueued=false;}
 window.addEventListener('scroll',()=>{if(!scrollQueued){requestAnimationFrame(scrollUpdate);scrollQueued=true;}},{passive:true});scrollUpdate();
 // Animate once, on entering view. Keep the final value available to screen readers.
 const counts=document.querySelectorAll('[data-count]');
@@ -212,6 +219,167 @@ if(build){
  else{inView=true;buildSync();}
  document.addEventListener('visibilitychange',buildSync);
 }
+
+// "Niste sigurni" callout: its only light follows the pointer wherever it is on
+// the page while the box is in view, with a little lag so it glides. Real
+// pointers only; off for reduced motion and when animations are paused.
+const callout=document.querySelector('[data-page="index.html"] #projekti .wrap');
+const finePointer=window.matchMedia('(hover: hover) and (pointer: fine)');
+if(callout){
+ let px=null,py=null,x=null,y=null,raf=0,inView=false,insetL=0,insetR=0;
+ // The light layer's insets are read once per resize, not every frame.
+ const readInsets=()=>{const b=getComputedStyle(callout,'::after');insetL=parseFloat(b.left)||0;insetR=parseFloat(b.right)||0;};
+ readInsets();window.addEventListener('resize',readInsets,{passive:true});
+ const enabled=()=>inView&&finePointer.matches&&!reduce.matches&&!userPaused;
+ const step=()=>{
+  raf=0;if(!enabled()){callout.classList.remove('glow-on');return;}
+  const r=callout.getBoundingClientRect();
+  const left=r.left+insetL,w=r.width-insetL-insetR;
+  // Before the first pointer move, rest the light near the top right of the box.
+  const tx=px===null?w*.82:px-left,ty=py===null?r.height*.15:py-r.top;
+  if(x===null){x=tx;y=ty;}
+  x+=(tx-x)*.12;y+=(ty-y)*.12;
+  callout.style.setProperty('--mx',x.toFixed(1)+'px');callout.style.setProperty('--my',y.toFixed(1)+'px');
+  callout.classList.add('glow-on');
+  if(Math.abs(tx-x)+Math.abs(ty-y)>.3)raf=requestAnimationFrame(step);
+ };
+ const kick=()=>{if(!raf)raf=requestAnimationFrame(step);};
+ window.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'&&e.pointerType!=='pen')return;px=e.clientX;py=e.clientY;if(inView)kick();},{passive:true});
+ window.addEventListener('scroll',()=>{if(inView)kick();},{passive:true});
+ if('IntersectionObserver'in window)new IntersectionObserver(e=>{inView=e[0].isIntersecting;kick();},{rootMargin:'200px 0px'}).observe(callout);
+ else{inView=true;kick();}
+ finePointer.addEventListener?.('change',kick);reduce.addEventListener('change',kick);toggle?.addEventListener('click',kick);
+}
+
+// 80 € offer: one entrance when the card comes into view (strike, price, sheen).
+// Light CSS, so it also plays in static mode; skipped when paused or reduced.
+const offerCard=document.querySelector('.launch-offer');
+if(offerCard&&'IntersectionObserver'in window){
+ const offerIo=new IntersectionObserver(entries=>{
+  if(!entries[0].isIntersecting)return;offerIo.disconnect();
+  if(!userPaused&&!reduce.matches)offerCard.classList.add('offer-play');
+ },{threshold:.35});
+ offerIo.observe(offerCard);
+}
+
+// Offer card: the border lights up where the pointer is (mouse only).
+// --px/--py are registered in CSS, so the light glides between positions.
+const offerEdge=document.querySelector('.launch-offer');
+offerEdge?.addEventListener('pointermove',e=>{
+ if(e.pointerType!=='mouse'||reduce.matches)return;
+ const r=offerEdge.getBoundingClientRect();
+ offerEdge.style.setProperty('--px',(e.clientX-r.left).toFixed(0)+'px');offerEdge.style.setProperty('--py',(e.clientY-r.top).toFixed(0)+'px');
+},{passive:true});
+
+// One shared mouse position, read once per frame by the pointer effects below.
+const mouse={x:null,y:null};const mouseSubscribers=new Set();let mouseRaf=0;
+window.addEventListener('pointermove',e=>{
+ if(e.pointerType!=='mouse')return;mouse.x=e.clientX;mouse.y=e.clientY;
+ if(!mouseRaf)mouseRaf=requestAnimationFrame(()=>{mouseRaf=0;mouseSubscribers.forEach(fn=>fn());});
+},{passive:true});
+document.documentElement.addEventListener('pointerleave',()=>{mouse.x=null;mouse.y=null;mouseSubscribers.forEach(fn=>fn());});
+const pointerFxAllowed=()=>finePointer.matches&&!reduce.matches&&!userPaused;
+// Scrolling re-runs the pointer effects through the same once-per-frame queue.
+const queuePointerFx=()=>{if(!mouseRaf)mouseRaf=requestAnimationFrame(()=>{mouseRaf=0;mouseSubscribers.forEach(fn=>fn());});};
+window.addEventListener('scroll',queuePointerFx,{passive:true});
+
+// Packages: hover is decided from each card's layout box (offsetLeft/Top ignore
+// the lift), so a lifted card never slides out from under the cursor and flickers.
+const plansGrid=document.querySelector('.plans');
+if(plansGrid){
+ const cards=[...plansGrid.querySelectorAll('.plan')];let current=null,inView=false;
+ const update=()=>{
+  let hit=null;
+  if(inView&&pointerFxAllowed()&&mouse.x!==null){
+   const base=plansGrid.offsetParent?.getBoundingClientRect();
+   if(base)for(const c of cards){
+    const l=base.left+c.offsetLeft,t=base.top+c.offsetTop;
+    if(mouse.x>=l&&mouse.x<=l+c.offsetWidth&&mouse.y>=t&&mouse.y<=t+c.offsetHeight){
+     hit=c;c.style.setProperty('--px',(mouse.x-l).toFixed(0)+'px');c.style.setProperty('--py',(mouse.y-t).toFixed(0)+'px');break;
+    }
+   }
+  }
+  if(hit!==current){current?.classList.remove('is-hover');hit?.classList.add('is-hover');current=hit;plansGrid.classList.toggle('has-hover',!!hit);}
+ };
+ mouseSubscribers.add(update);
+ if('IntersectionObserver'in window)new IntersectionObserver(e=>{inView=e[0].isIntersecting;update();}).observe(plansGrid);else inView=true;
+}
+
+// Responsive lab: like "Niste sigurni", it reacts to the mouse while it is on
+// screen, even before the cursor reaches it. The border light moves to the
+// nearest edge and the demo device leans toward the cursor, eased per frame.
+const lab=document.querySelector('.responsive-lab'),labDevice=lab?.querySelector('.demo-device');
+if(lab&&labDevice){
+ let tx=0,ty=0,x=0,y=0,raf=0,inView=false;
+ const clamp=v=>Math.max(-1,Math.min(1,v));
+ const step=()=>{
+  raf=0;x+=(tx-x)*.09;y+=(ty-y)*.09;
+  const resting=Math.abs(x)+Math.abs(y)<.01&&!tx&&!ty;
+  labDevice.style.transform=resting?'':`rotateX(${y.toFixed(2)}deg) rotateY(${x.toFixed(2)}deg) translateZ(0)`;
+  if(Math.abs(tx-x)+Math.abs(ty-y)>.01)raf=requestAnimationFrame(step);
+ };
+ const update=()=>{
+  const live=inView&&pointerFxAllowed()&&mouse.x!==null;
+  lab.classList.toggle('lab-live',live);
+  if(live){
+   const r=lab.getBoundingClientRect();
+   lab.style.setProperty('--px',(mouse.x-r.left).toFixed(0)+'px');lab.style.setProperty('--py',(mouse.y-r.top).toFixed(0)+'px');
+   const nx=clamp((mouse.x-(r.left+r.width/2))/(r.width*.75)),ny=clamp((mouse.y-(r.top+r.height/2))/(r.height*.75));
+   tx=nx*12;ty=-ny*9;
+  }else{tx=0;ty=0;}
+  if(!raf)raf=requestAnimationFrame(step);
+ };
+ mouseSubscribers.add(update);
+ if('IntersectionObserver'in window)new IntersectionObserver(e=>{inView=e[0].isIntersecting;update();},{rootMargin:'120px 0px'}).observe(lab);else inView=true;
+ toggle?.addEventListener('click',update);
+}
+
+// Buttons: the hover fill grows from the side the mouse came in and shrinks
+// toward the side it leaves. Mouse only; touch keeps the press feedback.
+document.querySelectorAll('.btn,.nav-cta').forEach(btn=>{
+ const place=e=>{
+  const r=btn.getBoundingClientRect();
+  btn.style.setProperty('--bx',(e.clientX-r.left).toFixed(0)+'px');btn.style.setProperty('--by',(e.clientY-r.top).toFixed(0)+'px');
+  btn.style.setProperty('--br',Math.ceil(Math.hypot(r.width,r.height))+'px');
+ };
+ btn.addEventListener('pointerenter',e=>{if(e.pointerType!=='mouse')return;place(e);requestAnimationFrame(()=>btn.classList.add('fill-on'));});
+ btn.addEventListener('pointerleave',e=>{if(e.pointerType!=='mouse')return;place(e);btn.classList.remove('fill-on');});
+});
+
+// Service pages: glass blocks get a border light that follows the mouse.
+document.querySelectorAll('.feature-card,.status-panel,.terminal-panel,.device-row,.hero-visual,.screen-check,.duty-col,.seo-timeline,.practice-list,.related-item').forEach(block=>{
+ if(block.closest('[data-page="index.html"]')&&!block.closest('.feature-grid'))return;
+ block.classList.add('glass-edge');
+ block.addEventListener('pointermove',e=>{
+  if(e.pointerType!=='mouse'||reduce.matches)return;
+  const r=block.getBoundingClientRect();
+  block.style.setProperty('--px',(e.clientX-r.left).toFixed(0)+'px');block.style.setProperty('--py',(e.clientY-r.top).toFixed(0)+'px');
+ },{passive:true});
+});
+
+// Portfolio page: the project preview responds to the mouse with depth.
+// The desktop screenshot leans a little, the phone moves further (parallax),
+// and a soft light follows the cursor. Eased per frame; mouse only.
+document.querySelectorAll('.project-visual,.site-demo').forEach(visual=>{
+ const desk=visual.querySelector('.device-desktop,.sd-browser'),phone=visual.querySelector('.device-mobile,.sd-phone');
+ if(!desk)return;
+ let tx=0,ty=0,x=0,y=0,raf=0;
+ const step=()=>{
+  raf=0;x+=(tx-x)*.1;y+=(ty-y)*.1;
+  const rest=!tx&&!ty&&Math.abs(x)+Math.abs(y)<.002;
+  desk.style.transform=rest?'':`translate3d(${(x*-10).toFixed(2)}px,${(y*-8).toFixed(2)}px,0) rotateX(${(y*-4).toFixed(2)}deg) rotateY(${(x*5).toFixed(2)}deg)`;
+  if(phone)phone.style.transform=rest?'':`translate3d(${(x*18).toFixed(2)}px,${(y*14).toFixed(2)}px,0) rotate(${(x*2).toFixed(2)}deg)`;
+  if(Math.abs(tx-x)+Math.abs(ty-y)>.002)raf=requestAnimationFrame(step);
+ };
+ visual.addEventListener('pointermove',e=>{
+  if(e.pointerType!=='mouse'||reduce.matches||userPaused)return;
+  const r=visual.getBoundingClientRect();
+  tx=(e.clientX-r.left)/r.width-.5;ty=(e.clientY-r.top)/r.height-.5;
+  visual.style.setProperty('--px',(e.clientX-r.left).toFixed(0)+'px');visual.style.setProperty('--py',(e.clientY-r.top).toFixed(0)+'px');
+  visual.classList.add('is-live');if(!raf)raf=requestAnimationFrame(step);
+ },{passive:true});
+ visual.addEventListener('pointerleave',()=>{tx=0;ty=0;visual.classList.remove('is-live');if(!raf)raf=requestAnimationFrame(step);});
+});
 
 // FAQ accordion: animate height on open and close; interruptible mid-way.
 const faqEase='cubic-bezier(.23,1,.32,1)';

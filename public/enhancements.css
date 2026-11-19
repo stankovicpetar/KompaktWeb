@@ -27,7 +27,7 @@ html{scroll-padding-top:100px}body{overflow-x:clip}::selection{background:#00d9a
 /* Keep the expanded navigation comfortable on smaller desktop screens. */
 @media(min-width:1101px) and (max-width:1360px){.nav-links{gap:14px;font-size:12px}.nav-cta{display:none}}
 /* A fully static first paint. The animated layer is a deferred enhancement. */
-.world-static{position:absolute;inset:0;width:100%;height:100%;opacity:.65;object-fit:contain;pointer-events:none}.hero-art #world[hidden]{display:none!important}.hero-art.art-motion .world-static{visibility:hidden}.hero-art .laptop,.hero-art .floating-chip{animation:none!important}.hero-art .scene{transform:rotateX(5deg) rotateY(-14deg);transition:none!important}.motion-toggle:disabled{cursor:default;text-decoration:none;opacity:.8}.performance-static *,.performance-static *::before,.performance-static *::after{animation:none!important;transition:none!important;}.performance-static .reveal{opacity:1;transform:none}.performance-static .world-static{visibility:visible!important}.hero-art::before{filter:none}.hero-art{content-visibility:auto;contain-intrinsic-size:500px 510px}
+.world-static{position:absolute;inset:0;width:100%;height:100%;opacity:.65;object-fit:contain;pointer-events:none}.hero-art #world[hidden]{display:none!important}.hero-art.art-motion .world-static{visibility:hidden}.hero-art .laptop,.hero-art .floating-chip{animation:none!important}.hero-art .scene{transform:rotateX(5deg) rotateY(-14deg);transition:none!important}.motion-toggle:disabled{cursor:default;text-decoration:none;opacity:.8}.performance-static *,.performance-static *::before,.performance-static *::after{animation:none!important;}.performance-static .reveal{opacity:1;transform:none}.performance-static .world-static{visibility:visible!important}.hero-art::before{filter:none}.hero-art{content-visibility:auto;contain-intrinsic-size:500px 510px}
 @media(max-width:1100px){.nav-links{display:none}.burger{display:flex}.language-switch.flags{margin-left:auto}.nav-links.mobile-open{display:flex;position:fixed;left:0;right:0;top:68px;flex-direction:column;gap:0;background:#10141cfb;padding:20px 26px;max-height:calc(100dvh - 68px);overflow-y:auto;border-bottom:1px solid var(--line)}.nav-links.mobile-open>li{padding:10px 0;width:100%}.nav-item .dropdown-menu{position:static;box-shadow:none;margin-top:10px;min-width:0;display:none}.nav-item.open .dropdown-menu{display:block;opacity:1;visibility:visible;transform:none;max-height:500px}.nav-cta.mobile-open{display:none}}
 @media(max-width:850px){.benefit-stats .numbers-grid{grid-template-columns:1fr 1fr}.benefit-stats .numbers-grid>div{padding:25px 20px!important}.benefit-stats .numbers-grid>div:nth-child(2){border-right:0}.benefit-stats .numbers-grid>div:nth-child(-n+2){border-bottom:1px solid var(--line)}}
 @media(max-width:600px){.nav{gap:8px}.language-switch.flags{gap:2px;margin-left:auto}.flags a{width:29px;height:34px}.flags img{width:23px;height:16px}.logo{gap:6px;font-size:16px}.logo .sub{font-size:11px}.benefit-stats{padding-top:45px}.benefit-stats .numbers-grid>div{padding:22px 12px!important}.benefit-stat h3{font-size:15px;min-height:42px}.benefit-stat .stat-context,.benefit-stat .stat-benefit{font-size:11px;line-height:1.8}.benefit-stat .stat-source{font-size:8px}.research-note{font-size:9px}.world-static{opacity:.5}.hero-art{contain-intrinsic-size:350px 375px}.footer-area{font-size:10px}}
@@ -513,3 +513,879 @@ html.scroll-reveals .hero-art.reveal.in{transform:none}
 .performance-static .faq-list details.closing>p{animation:none!important;transition:opacity 160ms ease,transform 200ms var(--ease-out)!important}
 .performance-static .faq-list summary::before{transition:transform 220ms var(--ease-out),opacity 220ms ease!important}
 @media(prefers-reduced-motion:reduce){.performance-static .faq-list details[open]>p{animation:fade-only 160ms ease both!important}}
+
+/* ==========================================================================
+   Round 2: scrollbar, flags, phone packages, callout glow, portfolio hover.
+   ========================================================================== */
+
+/* Scrollbar in brand colours. Chromium and Safari get a rounded thumb that
+   turns green on hover; Firefox gets the matching thin colours. */
+::-webkit-scrollbar{width:12px;height:12px}
+::-webkit-scrollbar-track{background:var(--ink)}
+::-webkit-scrollbar-thumb{background:#36494d;border:3px solid var(--ink);border-radius:999px}
+::-webkit-scrollbar-thumb:hover{background:#00d9a3b3}
+::-webkit-scrollbar-thumb:active{background:var(--signal)}
+::-webkit-scrollbar-corner{background:var(--ink)}
+@supports (-moz-appearance:none){html,.nav-links.mobile-open,.offer-dialog{scrollbar-width:thin;scrollbar-color:#36494d var(--ink)}}
+
+/* Language flags: rounded, with the outline sitting directly on the flag.
+   The tap target stays large through an invisible hit area. */
+.language-switch.flags{gap:10px}
+.language-switch.flags a{position:relative;display:block;width:auto;height:auto;padding:0;border:0;border-radius:5px;background:none!important;opacity:.55;transition:opacity 200ms ease}
+.language-switch.flags a::before{content:'';position:absolute;inset:-12px -5px}
+.language-switch.flags img{display:block;width:27px;height:18px;object-fit:cover;border-radius:5px;transition:box-shadow 200ms ease}
+.language-switch.flags a:hover,.language-switch.flags a[aria-current=page]{opacity:1}
+.language-switch.flags a:hover img{box-shadow:0 0 0 2px #00d9a380}
+.language-switch.flags a[aria-current=page] img{box-shadow:0 0 0 2px var(--signal)}
+.language-switch.flags a:focus-visible{outline:2px solid var(--signal);outline-offset:3px}
+@media(max-width:600px){
+  .language-switch.flags{gap:9px}
+  .language-switch.flags img{width:25px;height:17px;border-radius:4px}
+  .language-switch.flags a{border-radius:4px}
+}
+
+/* Packages on phones: separate rounded cards instead of one joined table. */
+@media(max-width:720px){
+  .plans{gap:16px;background:none;border:0;border-radius:0;overflow:visible;box-shadow:none}
+  .plan{border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 24px 50px -36px var(--shadow-tint)}
+  .plan.featured{border-color:var(--signal);box-shadow:0 24px 60px -34px rgba(0,217,163,.45)}
+  .plan.featured::before{border-radius:0 0 0 10px}
+}
+
+/* "Niste sigurni": a soft green light follows the pointer (desktop only). */
+[data-page="index.html"] #projekti .wrap::after{content:'';position:absolute;inset:0 32px;border-radius:var(--r-lg);pointer-events:none;opacity:0;
+  background:radial-gradient(380px circle at var(--mx,80%) var(--my,0%),rgba(0,217,163,.2),rgba(0,217,163,.06) 45%,transparent 70%);
+  transition:opacity 500ms var(--ease-out)}
+[data-page="index.html"] #projekti .wrap.glow-on::after{opacity:1}
+[data-page="index.html"] #projekti .wrap.glow-on::before{border-color:#00d9a338;transition:border-color 500ms ease}
+
+/* Portfolio hover: one slow, smooth move. The card lights up, the desktop
+   view rises and settles, the phone straightens and floats forward. */
+.work-preview{position:relative}
+.work-preview::after{content:'';position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;opacity:0;
+  box-shadow:inset 0 0 0 1px #00d9a366,0 40px 90px -50px rgba(0,217,163,.5);transition:opacity 650ms var(--ease-out)}
+.work-image>img{transform:translateY(14px);transition:transform 900ms cubic-bezier(.22,1,.36,1)!important}
+.work-phone{transform:rotate(4deg);transition:transform 900ms cubic-bezier(.22,1,.36,1) 60ms!important}
+.work-arrow{transition:transform 600ms cubic-bezier(.22,1,.36,1)!important}
+.work-preview:hover .work-image>img{transform:translateY(14px)}
+.work-preview:hover .work-phone{transform:rotate(4deg)}
+.work-preview:hover .work-arrow{transform:none}
+@media (hover:hover) and (pointer:fine){
+  .work-preview:hover::after{opacity:1}
+  .work-preview:hover .work-image>img{transform:translateY(2px) scale(1.012)}
+  .work-preview:hover .work-phone{transform:rotate(-1.5deg) translate(-8px,-16px)}
+  .work-preview:hover .work-arrow{transform:translate(4px,-4px)}
+}
+@media(prefers-reduced-motion:reduce){
+  .work-image>img,.work-phone,.work-preview:hover .work-image>img,.work-preview:hover .work-phone{transform:none!important;transition:none!important}
+  .work-preview::after{transition:opacity 200ms ease}
+  [data-page="index.html"] #projekti .wrap::after{display:none}
+}
+
+/* ==========================================================================
+   Round 3: smoother button hovers, pointer-only light in "Niste sigurni".
+   ========================================================================== */
+:root{--ease-smooth:cubic-bezier(.22,1,.36,1)}
+
+/* Buttons: hover eases in and out over ~400ms; press stays quick (140ms)
+   and the release glides back. Outline buttons fill with a faint green. */
+.btn,.nav-cta,.plan-btn{transition:background-color 380ms var(--ease-smooth),border-color 380ms var(--ease-smooth),color 380ms var(--ease-smooth),box-shadow 460ms var(--ease-smooth),transform 460ms var(--ease-smooth)}
+.btn-arrow,.text-link span{transition:transform 460ms var(--ease-smooth)}
+.device-controls button{transition:background-color 320ms var(--ease-smooth),border-color 320ms var(--ease-smooth),color 320ms var(--ease-smooth),transform 320ms var(--ease-smooth)}
+.btn.btn:active,.nav-cta.nav-cta:active,.plan-btn.plan-btn:active{transform:scale(.97);transition-duration:140ms}
+@media (hover:hover) and (pointer:fine){
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 18px 36px -16px rgba(0,217,163,.75)}
+  .btn-outline:hover,.plan-btn:hover,.nav-cta:hover{background-color:rgba(0,217,163,.07)}
+  .plan.featured .plan-btn:hover{background-color:#22f0ba}
+  .btn:hover .btn-arrow,.text-link:hover span{transform:translateX(4px)}
+}
+@media(prefers-reduced-motion:reduce){.btn-primary:hover{transform:none}}
+
+/* "Niste sigurni": no fixed glow; only the light that follows the pointer. */
+[data-page="index.html"] #projekti .wrap::before{background:var(--ink-2)}
+[data-page="index.html"] #projekti .wrap.glow-on::before{border-color:var(--line)}
+[data-page="index.html"] #projekti .wrap::after{
+  background:radial-gradient(460px circle at var(--mx,80%) var(--my,15%),rgba(0,217,163,.22),rgba(0,217,163,.07) 42%,transparent 70%);
+  transition:opacity 700ms var(--ease-smooth)}
+@media(max-width:600px){[data-page="index.html"] #projekti .wrap::after{inset:0 22px}}
+
+/* ==========================================================================
+   Round 4: offer entrance, smoother links and buttons, glass package cards.
+   ========================================================================== */
+@property --px{syntax:'<length>';inherits:true;initial-value:-400px}
+@property --py{syntax:'<length>';inherits:true;initial-value:-400px}
+
+/* Buttons and links: slower, softer easing in both directions. */
+.btn,.nav-cta,.plan-btn{transition:background-color 520ms var(--ease-smooth),border-color 520ms var(--ease-smooth),color 520ms var(--ease-smooth),box-shadow 600ms var(--ease-smooth),transform 600ms var(--ease-smooth)}
+.btn-arrow,.text-link span,.work-arrow{transition:transform 600ms var(--ease-smooth)!important}
+.btn.btn:active,.nav-cta.nav-cta:active,.plan-btn.plan-btn:active{transition-duration:140ms}
+.nav-links a,.dropdown-trigger,.footer-navigation a,.footer-links a,.breadcrumbs a,.contact-detail a,.text-link,.flags a,.faq-list summary{transition:color 450ms var(--ease-smooth),border-color 450ms var(--ease-smooth),background-color 450ms var(--ease-smooth),opacity 450ms var(--ease-smooth)!important}
+.nav-links a::after{transition:transform 560ms var(--ease-smooth)!important}
+.dropdown-menu li a{transition:background-color 400ms var(--ease-smooth),color 400ms var(--ease-smooth)}
+.dropdown-trigger .caret{transition:transform 420ms var(--ease-smooth)}
+
+/* Packages: separate glass cards with rounded corners on every screen.
+   A soft colour field sits behind them so the frosted glass reads. */
+[data-page="index.html"] #paketi{overflow:clip}
+[data-page="index.html"] #paketi::before{content:'';position:absolute;inset:18% 0 4%;pointer-events:none;
+  background:radial-gradient(38% 46% at 22% 42%,rgba(0,217,163,.17),transparent 70%),radial-gradient(30% 40% at 78% 72%,rgba(255,182,72,.10),transparent 70%),radial-gradient(30% 36% at 58% 18%,rgba(0,217,163,.08),transparent 70%)}
+[data-page="index.html"] #paketi .wrap{position:relative;z-index:1}
+.plans{gap:18px;background:none;border:0;border-radius:0;overflow:visible;box-shadow:none}
+.plan,.plan.featured{position:relative;border-radius:24px;overflow:hidden;isolation:isolate;
+  background:linear-gradient(180deg,rgba(242,239,232,.075),rgba(242,239,232,.025));
+  -webkit-backdrop-filter:blur(20px) saturate(150%);backdrop-filter:blur(20px) saturate(150%);
+  border:1px solid rgba(242,239,232,.10);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),inset 0 -1px 0 rgba(255,255,255,.03),0 30px 60px -40px var(--shadow-tint)}
+.plan.featured{background:linear-gradient(180deg,rgba(0,217,163,.14),rgba(0,217,163,.03) 55%,rgba(242,239,232,.02));border-color:rgba(0,217,163,.45)}
+.plan.featured::before{border-radius:0 0 0 12px;z-index:2}
+.plan:hover{background:linear-gradient(180deg,rgba(242,239,232,.10),rgba(242,239,232,.035))}
+.plan.featured:hover{background:linear-gradient(180deg,rgba(0,217,163,.18),rgba(0,217,163,.04) 55%,rgba(242,239,232,.02))}
+/* Edge light that follows the pointer around the border. */
+.plan::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;z-index:1;opacity:0;
+  background:radial-gradient(220px circle at var(--px) var(--py),rgba(0,217,163,.95),rgba(0,217,163,.25) 40%,transparent 70%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
+  transition:opacity 600ms var(--ease-smooth),--px 220ms var(--ease-out),--py 220ms var(--ease-out)}
+/* Lift on hover without disturbing the scroll-reveal stagger. */
+html.scroll-reveals .plans .plan.reveal{transition:opacity var(--dur-reveal) var(--ease-out),transform var(--dur-reveal) var(--ease-out),translate 600ms var(--ease-smooth),background 600ms var(--ease-smooth),border-color 600ms var(--ease-smooth),box-shadow 600ms var(--ease-smooth)!important;
+  transition-delay:var(--reveal-delay,0ms),var(--reveal-delay,0ms),0ms,0ms,0ms,0ms!important}
+@media (hover:hover) and (pointer:fine){
+  .plan:hover::after{opacity:1}
+  .plans .plan:hover{translate:0 -6px;border-color:rgba(242,239,232,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 40px 70px -40px rgba(0,217,163,.35)}
+}
+@media(max-width:720px){.plans{gap:16px}.plan,.plan.featured{border-radius:20px}}
+
+/* 80 € offer: price strike draws on, the new price rises in, a light sheen
+   crosses the card once, and the button arrives last. Plays once. */
+.launch-offer{position:relative;overflow:hidden;isolation:isolate}
+.launch-offer>*{position:relative;z-index:1}
+.launch-offer::after{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;
+  background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.09) 48%,rgba(0,217,163,.10) 52%,transparent 70%);transform:translateX(-100%)}
+.launch-offer .offer-price del{position:relative;text-decoration:none}
+.launch-offer .offer-price del::after{content:'';position:absolute;left:-4%;right:-4%;top:52%;height:2px;background:var(--paper-dim);border-radius:2px;transform-origin:left}
+.launch-offer .offer-price strong{display:inline-block}
+.launch-offer.offer-play::after{animation:offer-sheen 1500ms var(--ease-in-out) 450ms both!important}
+.launch-offer.offer-play .offer-price del::after{animation:offer-strike 520ms var(--ease-out) 650ms both!important}
+.launch-offer.offer-play .offer-price strong{animation:offer-price 700ms var(--ease-out) 900ms both!important}
+.launch-offer.offer-play .offer-action .btn{animation:offer-rise 560ms var(--ease-out) 1250ms both!important}
+.launch-offer.offer-play .offer-spots{animation:offer-rise 520ms var(--ease-out) 300ms both!important}
+.motion-paused .launch-offer.offer-play *,.motion-paused .launch-offer.offer-play::after,.motion-paused .launch-offer.offer-play *::after{animation-play-state:running!important}
+@keyframes offer-sheen{0%{opacity:1;transform:translateX(-100%)}100%{opacity:1;transform:translateX(100%)}}
+@keyframes offer-strike{from{transform:scaleX(0)}}
+@keyframes offer-price{from{opacity:0;transform:translateY(14px) scale(.94);filter:blur(6px)}}
+@keyframes offer-rise{from{opacity:0;transform:translateY(10px)}}
+/* Offer edge light on hover, like the packages. */
+.launch-offer::before{content:'';position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;z-index:2;opacity:0;
+  background:radial-gradient(260px circle at var(--px) var(--py),rgba(242,239,232,.9),rgba(0,217,163,.4) 40%,transparent 70%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
+  transition:opacity 600ms var(--ease-smooth),--px 220ms var(--ease-out),--py 220ms var(--ease-out)}
+@media (hover:hover) and (pointer:fine){.launch-offer:hover::before{opacity:1}}
+
+@media(prefers-reduced-motion:reduce){
+  .launch-offer.offer-play *,.launch-offer.offer-play::after{animation:none!important}
+  .plans .plan:hover{translate:none}
+  .plan::after,.launch-offer::before{transition:opacity 200ms ease}
+}
+
+/* ==========================================================================
+   Round 5: shorter package cards, clearer hover, responsive lab hover.
+   ========================================================================== */
+
+/* Packages: tighter spacing so each card is noticeably shorter. */
+.plan{padding:26px 24px 24px}
+.plan-name{margin-bottom:8px}
+.plan-title{font-size:20px;margin-bottom:8px}
+.plan-price{font-size:34px;margin-bottom:4px}
+.plan-for{min-height:0;margin-bottom:12px;font-size:14px;line-height:1.5}
+.plan-desc{margin-bottom:14px;padding-bottom:14px;font-size:14px;line-height:1.5}
+.plan-features{margin-bottom:14px}
+.plan-features li{padding-top:4px;padding-bottom:4px;font-size:14px;line-height:1.5}
+.plan-note{margin-bottom:14px;font-size:12px}
+.plan-btn{padding-top:12px;padding-bottom:12px}
+@media(max-width:600px){.plan{padding:22px 20px 20px}}
+
+/* Packages hover: higher lift, brighter and thicker edge light, and a soft
+   spotlight inside the card that follows the pointer. */
+.plan::after{padding:2px;background:radial-gradient(300px circle at var(--px) var(--py),#5dffd6,rgba(0,217,163,.55) 30%,transparent 65%)}
+.plan>*{position:relative;z-index:1}
+.plan{background-image:radial-gradient(360px circle at var(--px) var(--py),rgba(0,217,163,0),transparent 70%),linear-gradient(180deg,rgba(242,239,232,.075),rgba(242,239,232,.025))}
+@media (hover:hover) and (pointer:fine){
+  .plans .plan:hover{translate:0 -12px;scale:1.015;border-color:rgba(0,217,163,.35);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 50px 80px -40px rgba(0,217,163,.45),0 0 0 1px rgba(0,217,163,.12)}
+  .plans .plan:hover{background-image:radial-gradient(360px circle at var(--px) var(--py),rgba(0,217,163,.14),transparent 70%),linear-gradient(180deg,rgba(242,239,232,.10),rgba(242,239,232,.035))}
+  .plans .plan.featured:hover{background-image:radial-gradient(360px circle at var(--px) var(--py),rgba(0,217,163,.2),transparent 70%),linear-gradient(180deg,rgba(0,217,163,.18),rgba(0,217,163,.04) 55%,rgba(242,239,232,.02))}
+  .plans:has(.plan:hover) .plan:not(:hover){opacity:.72}
+}
+html.scroll-reveals .plans .plan.reveal{transition:opacity 500ms var(--ease-smooth),transform var(--dur-reveal) var(--ease-out),translate 650ms var(--ease-smooth),scale 650ms var(--ease-smooth),border-color 600ms var(--ease-smooth),box-shadow 650ms var(--ease-smooth)!important;
+  transition-delay:0ms,var(--reveal-delay,0ms),0ms,0ms,0ms,0ms!important}
+
+/* Responsive lab: lifts, its border lights up where the mouse is, the
+   device tilts toward the pointer (experience.js) and gains depth. */
+.responsive-lab{position:relative;transition:box-shadow 600ms var(--ease-smooth),border-color 600ms var(--ease-smooth)}
+.responsive-lab::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;opacity:0;
+  background:radial-gradient(280px circle at var(--px) var(--py),#5dffd6,rgba(0,217,163,.45) 35%,transparent 70%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
+  transition:opacity 600ms var(--ease-smooth),--px 220ms var(--ease-out),--py 220ms var(--ease-out)}
+.demo-stage{perspective:900px}
+.demo-device{will-change:transform}
+.demo-device{transition:width 560ms var(--ease-in-out),height 560ms var(--ease-in-out),border-radius 560ms var(--ease-in-out),box-shadow 600ms var(--ease-smooth),border-color 600ms var(--ease-smooth)!important}
+@media (hover:hover) and (pointer:fine){
+  .responsive-lab:hover{border-color:rgba(0,217,163,.3);box-shadow:0 40px 80px -36px rgba(0,217,163,.35)}
+  .responsive-lab:hover::after{opacity:1}
+  .responsive-lab:hover .demo-device{border-color:var(--signal);box-shadow:0 30px 60px -20px rgba(0,217,163,.35),0 0 0 1px rgba(0,217,163,.25)}
+}
+@media(prefers-reduced-motion:reduce){
+  .plans .plan:hover{translate:none;scale:none}
+  .demo-device{transform:none!important}
+}
+
+/* ==========================================================================
+   Round 6 (apple-design): stable package hover, lab reacts before hover,
+   directional button fill, glass surfaces with a soft colour field behind.
+   ========================================================================== */
+:root{
+  --glass-bg:linear-gradient(180deg,rgba(242,239,232,.075),rgba(242,239,232,.022));
+  --glass-border:rgba(242,239,232,.11);
+  --glass-blur:blur(22px) saturate(150%);
+  --glass-shadow:inset 0 1px 0 rgba(255,255,255,.11),inset 0 -1px 0 rgba(255,255,255,.03),0 34px 70px -44px var(--shadow-tint);
+}
+
+/* Packages: hover state comes from experience.js (.is-hover), measured on the
+   card's resting box, so lifting it can no longer make it flicker. The CSS
+   :hover versions are neutralised. No scale: it blurs text under glass. */
+@media (hover:hover) and (pointer:fine){
+  .plans .plan:hover{translate:none;scale:none;border-color:rgba(242,239,232,.10);box-shadow:var(--glass-shadow);
+    background-image:linear-gradient(180deg,rgba(242,239,232,.075),rgba(242,239,232,.025))}
+  .plans .plan.featured:hover{border-color:rgba(0,217,163,.45);background-image:linear-gradient(180deg,rgba(0,217,163,.14),rgba(0,217,163,.03) 55%,rgba(242,239,232,.02))}
+  .plan:hover::after{opacity:0}
+  .plans:has(.plan:hover) .plan:not(:hover){opacity:1}
+
+  .plans .plan.is-hover,.plans .plan.featured.is-hover{translate:0 -10px;border-color:rgba(0,217,163,.38);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 50px 80px -40px rgba(0,217,163,.42),0 0 0 1px rgba(0,217,163,.12)}
+  .plans .plan.is-hover{background-image:radial-gradient(360px circle at var(--px) var(--py),rgba(0,217,163,.14),transparent 70%),linear-gradient(180deg,rgba(242,239,232,.10),rgba(242,239,232,.035))}
+  .plans .plan.featured.is-hover{background-image:radial-gradient(360px circle at var(--px) var(--py),rgba(0,217,163,.2),transparent 70%),linear-gradient(180deg,rgba(0,217,163,.18),rgba(0,217,163,.04) 55%,rgba(242,239,232,.02))}
+  .plans .plan.is-hover::after{opacity:1}
+  .plans.has-hover .plan:not(.is-hover){opacity:.7}
+}
+html.scroll-reveals .plans .plan.reveal{transition:opacity 500ms var(--ease-smooth),transform var(--dur-reveal) var(--ease-out),translate 650ms var(--ease-smooth),border-color 600ms var(--ease-smooth),box-shadow 650ms var(--ease-smooth)!important;
+  transition-delay:0ms,var(--reveal-delay,0ms),0ms,0ms,0ms!important}
+
+/* Responsive lab: lit and leaning while the mouse is anywhere near it. */
+@media (hover:hover) and (pointer:fine){
+  .responsive-lab:hover::after{opacity:0}
+  .responsive-lab.lab-live::after{opacity:1}
+  .responsive-lab.lab-live{border-color:rgba(0,217,163,.26)}
+}
+
+/* Buttons: the fill grows from the entry side and shrinks toward the exit. */
+.btn,.nav-cta{position:relative;isolation:isolate;overflow:hidden}
+.btn::before,.nav-cta::before{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;
+  background:rgba(0,217,163,.14);clip-path:circle(0px at var(--bx,50%) var(--by,50%));
+  transition:clip-path 620ms var(--ease-smooth)}
+.btn-primary::before,.plan.featured .plan-btn::before{background:rgba(255,255,255,.28)}
+.btn.fill-on::before,.nav-cta.fill-on::before{clip-path:circle(var(--br,300px) at var(--bx,50%) var(--by,50%))}
+@media (hover:hover) and (pointer:fine){
+  .btn-outline:hover,.plan-btn:hover,.nav-cta:hover{background-color:transparent}
+  .btn-primary:hover,.plan.featured .plan-btn:hover{background-color:var(--signal)}
+  .btn-outline:hover,.plan-btn:hover,.nav-cta:hover{border-color:var(--signal);color:var(--paper)}
+}
+
+/* Glass surfaces. A soft colour field behind each section gives the frosted
+   glass something to blur, the way Apple materials sit over content. */
+[data-page="index.html"] #iskustvo,[data-page="index.html"] #projekti,[data-page="index.html"] .featured-work,[data-page="index.html"] #akcija,[data-page="index.html"] #kontakt{overflow:clip}
+[data-page="index.html"] #iskustvo::before,[data-page="index.html"] #projekti::before,[data-page="index.html"] .featured-work::before,[data-page="index.html"] #akcija::before,[data-page="index.html"] #kontakt::before{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:0}
+[data-page="index.html"] #iskustvo::before{background:radial-gradient(34% 46% at 74% 50%,rgba(0,217,163,.16),transparent 70%),radial-gradient(22% 30% at 92% 80%,rgba(255,182,72,.09),transparent 70%)}
+[data-page="index.html"] #projekti::before{background:radial-gradient(30% 70% at 18% 40%,rgba(0,217,163,.12),transparent 70%),radial-gradient(24% 60% at 86% 60%,rgba(255,182,72,.08),transparent 70%)}
+[data-page="index.html"] .featured-work::before{background:radial-gradient(40% 45% at 30% 55%,rgba(0,217,163,.13),transparent 70%),radial-gradient(28% 36% at 82% 78%,rgba(255,182,72,.08),transparent 70%)}
+[data-page="index.html"] #akcija::before{background:radial-gradient(36% 80% at 80% 50%,rgba(0,217,163,.16),transparent 70%),radial-gradient(26% 60% at 14% 40%,rgba(255,182,72,.08),transparent 70%)}
+[data-page="index.html"] #kontakt::before{background:radial-gradient(32% 46% at 70% 40%,rgba(0,217,163,.13),transparent 70%),radial-gradient(22% 34% at 90% 85%,rgba(255,182,72,.07),transparent 70%)}
+[data-page="index.html"] #iskustvo>.wrap,[data-page="index.html"] .featured-work>.wrap,[data-page="index.html"] #akcija>.wrap,[data-page="index.html"] #kontakt>.wrap{position:relative;z-index:1}
+[data-page="index.html"] #projekti>.wrap{z-index:1}
+
+.responsive-lab,.work-preview,.launch-offer,.form{
+  background:var(--glass-bg);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+  border:1px solid var(--glass-border);box-shadow:var(--glass-shadow)}
+.launch-offer{background:linear-gradient(120deg,rgba(0,217,163,.13),rgba(242,239,232,.04) 55%,rgba(242,239,232,.02));border-color:rgba(0,217,163,.42)}
+.work-image{background:radial-gradient(at 50% 100%,rgba(10,58,48,.85),rgba(23,28,38,.35) 70%)}
+[data-page="index.html"] #projekti .wrap::before{background:var(--glass-bg);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+  border-color:var(--glass-border);box-shadow:var(--glass-shadow)}
+.field input,.field select,.field textarea{background-color:rgba(10,14,20,.5);border-color:rgba(242,239,232,.14)}
+.field select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%2300d9a3'/></svg>")}
+.demo-device{background:rgba(16,20,28,.82)}
+@media (hover:hover) and (pointer:fine){
+  .responsive-lab.lab-live,.work-preview:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 44px 80px -40px rgba(0,217,163,.32)}
+}
+
+/* Accessibility: solid surfaces when transparency is reduced; no fill motion
+   and no lean when motion is reduced. */
+@media(prefers-reduced-transparency:reduce){
+  .plan,.plan.featured,.responsive-lab,.work-preview,.launch-offer,.form,[data-page="index.html"] #projekti .wrap::before{
+    -webkit-backdrop-filter:none;backdrop-filter:none;background:var(--ink-2)}
+}
+@media(prefers-reduced-motion:reduce){
+  .btn::before,.nav-cta::before{transition:opacity 200ms ease;clip-path:none;opacity:0}
+  .btn.fill-on::before,.nav-cta.fill-on::before{opacity:1}
+  .plans .plan.is-hover{translate:none}
+}
+
+/* ==========================================================================
+   Round 7: performance and the edge-light colour flash.
+   ========================================================================== */
+
+/* 1. Grain: the fixed, full-screen layer with mix-blend-mode had to be
+   re-blended over the whole viewport on every scroll frame. The same grain
+   now sits in the page background and scrolls with it (painted once). */
+body::after{content:none;display:none}
+body{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .035 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-repeat:repeat}
+
+/* 2. Glass without live blur. The colour fields behind the cards are already
+   soft gradients, so blurring them changed almost nothing visually but cost a
+   full re-blur of every card on every scroll frame. The look stays: frosted
+   translucent fill, bright top edge, soft depth. Only the fixed header keeps
+   a real blur, because page content actually scrolls under it. */
+.plan,.plan.featured,.responsive-lab,.work-preview,.launch-offer,.form,
+[data-page="index.html"] #projekti .wrap::before{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+.plan,.responsive-lab,.work-preview,.form,[data-page="index.html"] #projekti .wrap::before{
+  background:linear-gradient(180deg,rgba(38,46,58,.62),rgba(23,28,38,.5))}
+.plan.featured{background:linear-gradient(180deg,rgba(14,58,50,.62),rgba(20,32,36,.5) 55%,rgba(23,28,38,.5))}
+.launch-offer{background:linear-gradient(120deg,rgba(14,58,50,.6),rgba(30,38,48,.52) 55%,rgba(23,28,38,.5))}
+@media (hover:hover) and (pointer:fine){
+  .plans .plan:hover{background-image:linear-gradient(180deg,rgba(38,46,58,.62),rgba(23,28,38,.5))}
+  .plans .plan.featured:hover{background-image:linear-gradient(180deg,rgba(14,58,50,.62),rgba(20,32,36,.5) 55%,rgba(23,28,38,.5))}
+  .plans .plan.is-hover{background-image:radial-gradient(360px circle at var(--px) var(--py),rgba(0,217,163,.13),transparent 70%),linear-gradient(180deg,rgba(44,53,66,.66),rgba(26,32,42,.54))}
+  .plans .plan.featured.is-hover{background-image:radial-gradient(360px circle at var(--px) var(--py),rgba(0,217,163,.18),transparent 70%),linear-gradient(180deg,rgba(14,64,55,.66),rgba(20,34,38,.54) 55%,rgba(23,28,38,.5))}
+}
+/* The header blur is skipped on low-power devices (static mode). */
+.performance-static header{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(16,20,28,.94)}
+
+/* 3. Hover depth without animating big blurred shadows (each frame of a
+   box-shadow transition repaints the whole card area). Cards keep a fixed
+   shadow; hover changes lift, border and edge light only. */
+@media (hover:hover) and (pointer:fine){
+  .plans .plan.is-hover,.plans .plan.featured.is-hover{box-shadow:var(--glass-shadow)}
+  .responsive-lab.lab-live,.work-preview:hover,.responsive-lab:hover{box-shadow:var(--glass-shadow)}
+  .btn-primary:hover{box-shadow:0 10px 26px -12px rgba(0,217,163,.55)}
+}
+html.scroll-reveals .plans .plan.reveal{transition:opacity 500ms var(--ease-smooth),transform var(--dur-reveal) var(--ease-out),translate 650ms var(--ease-smooth),border-color 600ms var(--ease-smooth)!important;
+  transition-delay:0ms,var(--reveal-delay,0ms),0ms,0ms!important}
+.responsive-lab{transition:border-color 600ms var(--ease-smooth)}
+.btn,.nav-cta,.plan-btn{transition:background-color 520ms var(--ease-smooth),border-color 520ms var(--ease-smooth),color 520ms var(--ease-smooth),transform 600ms var(--ease-smooth)}
+
+/* 4. Edge light: no sliding in from the left. The position used to glide in
+   from its off-screen start value, which showed as a lighter streak along the
+   left edge each time a card was entered. It now appears where the mouse is,
+   fades in only through opacity, and uses the brand green throughout. */
+.plan::after,.launch-offer::before,.responsive-lab::after{transition:opacity 500ms var(--ease-smooth)!important}
+.plan::after{background:radial-gradient(260px circle at var(--px) var(--py),rgba(0,217,163,.95),rgba(0,217,163,.35) 35%,transparent 65%)}
+.responsive-lab::after{background:radial-gradient(280px circle at var(--px) var(--py),rgba(0,217,163,.9),rgba(0,217,163,.3) 35%,transparent 70%)}
+.launch-offer::before{background:radial-gradient(260px circle at var(--px) var(--py),rgba(0,217,163,.95),rgba(0,217,163,.35) 35%,transparent 65%)}
+.launch-offer:not(:hover)::before{transition-duration:300ms!important}
+/* Primary button hover fill stays in the brand green instead of a pale wash. */
+.btn-primary::before,.plan.featured .plan-btn::before{background:#3ff2c4}
+
+/* 5. Decorative layers do not need the main thread or repaints. */
+.orbit{will-change:transform}
+.scroll-progress{will-change:transform}
+
+/* ==========================================================================
+   Round 8: the form's package dropdown matches the glass style.
+   Same native <select> (name, values and preselection unchanged).
+   Browsers with customizable selects (Chrome, Edge, Android) get the glass
+   popup; others keep their native list in the site's dark colours.
+   ========================================================================== */
+.field select option{background-color:#171c26;color:var(--paper)}
+
+@supports (appearance:base-select){
+  .field select,.field select::picker(select){appearance:base-select}
+  .field select{display:flex;align-items:center;justify-content:space-between;gap:12px;background-image:none;cursor:pointer;
+    color:var(--paper);font:400 15.5px/1.4 var(--body)}
+  .field select::picker-icon{content:'';width:10px;height:6px;flex-shrink:0;background:var(--signal);
+    clip-path:polygon(0 0,100% 0,50% 100%);transition:rotate 320ms var(--ease-smooth)}
+  .field select:open{border-color:var(--signal);box-shadow:0 0 0 3px var(--glow)}
+  .field select:open::picker-icon{rotate:180deg}
+
+  /* The popup: frosted glass, light top edge, soft depth. It is small and
+     only open briefly, so a real backdrop blur is affordable here. */
+  .field select::picker(select){margin-top:8px;padding:6px;min-width:anchor-size(width);
+    border:1px solid rgba(242,239,232,.13);border-radius:14px;color:var(--paper);
+    background:linear-gradient(180deg,rgba(38,46,58,.78),rgba(18,23,31,.86));
+    -webkit-backdrop-filter:blur(22px) saturate(150%);backdrop-filter:blur(22px) saturate(150%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 28px 60px -22px rgba(0,0,0,.7),0 0 0 1px rgba(0,217,163,.06);
+    transform-origin:top center;opacity:1;translate:0 0;scale:1;
+    transition:opacity 220ms var(--ease-out),translate 280ms var(--ease-smooth),scale 280ms var(--ease-smooth),display 280ms allow-discrete,overlay 280ms allow-discrete}
+  .field select:not(:open)::picker(select){opacity:0;translate:0 -6px;scale:.98}
+  @starting-style{.field select:open::picker(select){opacity:0;translate:0 -6px;scale:.98}}
+
+  .field select option{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:9px;background:transparent;
+    color:var(--paper-dim);font:400 15px/1.35 var(--body);cursor:pointer;transition:background-color 240ms var(--ease-smooth),color 240ms var(--ease-smooth)}
+  .field select option:hover,.field select option:focus-visible{background:rgba(0,217,163,.12);color:var(--paper);outline:none}
+  .field select option:checked{color:var(--signal);font-weight:500}
+  .field select option::checkmark{order:1;margin-left:auto;color:var(--signal);font-size:13px}
+  .field select option+option{margin-top:2px}
+
+  @media(prefers-reduced-motion:reduce){
+    .field select::picker(select),.field select::picker-icon{transition:opacity 150ms ease}
+    .field select:not(:open)::picker(select){translate:none;scale:none}
+  }
+  @media(prefers-reduced-transparency:reduce){
+    .field select::picker(select){-webkit-backdrop-filter:none;backdrop-filter:none;background:#171c26}
+  }
+}
+
+/* ==========================================================================
+   Round 9: green lives inside the boxes; wide Turnstile in the form.
+   ========================================================================== */
+
+/* On narrow screens the section colour fields turned into a narrow vertical
+   band above the lab and the form. They are dropped there; the green now sits
+   inside the boxes on every screen. */
+@media(max-width:900px){
+  [data-page="index.html"] #iskustvo::before,[data-page="index.html"] #projekti::before,[data-page="index.html"] .featured-work::before,
+  [data-page="index.html"] #akcija::before,[data-page="index.html"] #kontakt::before,[data-page="index.html"] #paketi::before{display:none}
+}
+
+/* A soft resting glow inside the responsive lab and "Niste sigurni", visible
+   without a mouse; on desktop the pointer light moves on top of it. */
+.responsive-lab{background:
+  radial-gradient(110% 65% at 92% 0%,rgba(0,217,163,.17),transparent 62%),
+  radial-gradient(70% 55% at 0% 100%,rgba(0,217,163,.08),transparent 70%),
+  linear-gradient(180deg,rgba(38,46,58,.62),rgba(23,28,38,.5))}
+[data-page="index.html"] #projekti .wrap::before{background:
+  radial-gradient(70% 120% at 100% 0%,rgba(0,217,163,.16),transparent 60%),
+  radial-gradient(50% 90% at 0% 100%,rgba(0,217,163,.07),transparent 70%),
+  linear-gradient(180deg,rgba(38,46,58,.62),rgba(23,28,38,.5))}
+.form{background:
+  radial-gradient(90% 50% at 100% 0%,rgba(0,217,163,.08),transparent 65%),
+  linear-gradient(180deg,rgba(38,46,58,.62),rgba(23,28,38,.5))}
+
+/* Turnstile: full-width (flexible) widget that fills the form. Phones get a
+   little less side padding so the 300px minimum fits; on very narrow screens
+   the inline script falls back to the compact size. */
+.cf-turnstile{width:100%;min-height:65px;margin:4px 0 6px}
+@media(max-width:600px){.form{padding:24px 14px}}
+
+/* ==========================================================================
+   Round 10: Turnstile fit, glass popup, portfolio project card.
+   ========================================================================== */
+
+/* Turnstile: leave the widget's own frame alone (an override cut its right
+   edge on desktop). On phones the contact area gets a little more width so
+   the full-width widget's 300px minimum fits from 360px-wide screens up. */
+.cf-turnstile{overflow:visible;max-width:100%}
+@media(max-width:600px){
+  #kontakt>.wrap{padding-left:12px;padding-right:12px}
+  .form{padding:24px 14px}
+}
+
+/* Offer popup: a glass sheet over a dimmed, softly blurred page. It
+   materialises (blur + scale + fade) instead of only fading. */
+.offer-dialog{
+  background:linear-gradient(180deg,rgba(40,50,60,.72),rgba(16,20,28,.82));
+  -webkit-backdrop-filter:blur(26px) saturate(160%);backdrop-filter:blur(26px) saturate(160%);
+  border:1px solid rgba(242,239,232,.14);border-radius:24px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 0 0 1px rgba(0,217,163,.08),0 40px 100px -30px rgba(0,0,0,.75);
+  filter:blur(6px);transition:opacity 280ms var(--ease-out),transform 360ms var(--ease-smooth),filter 320ms var(--ease-out)}
+.offer-dialog::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;
+  background:radial-gradient(90% 55% at 100% 0%,rgba(0,217,163,.2),transparent 65%),radial-gradient(60% 45% at 0% 100%,rgba(255,182,72,.08),transparent 70%)}
+.offer-dialog.visible{filter:none}
+.offer-dialog::backdrop{background:rgba(8,13,22,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.performance-static .offer-dialog::backdrop{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(8,13,22,.78)}
+.offer-dialog .offer-close{border-radius:50%;width:36px;height:36px;right:12px;top:12px;font-size:22px;background:rgba(242,239,232,.06);transition:background-color 300ms var(--ease-smooth),color 300ms var(--ease-smooth)}
+.offer-dialog .offer-close:hover{background:rgba(0,217,163,.14);color:var(--paper)}
+.offer-dialog .btn{border-radius:12px}
+@media(prefers-reduced-motion:reduce){.offer-dialog{filter:none!important}}
+@media(prefers-reduced-transparency:reduce){.offer-dialog{-webkit-backdrop-filter:none;backdrop-filter:none;background:#171c26}.offer-dialog::backdrop{backdrop-filter:none}}
+
+/* Portfolio page: rounded glass project card with an interactive preview. */
+[data-page="projekti"] .project-visual{border-radius:22px;border:1px solid rgba(242,239,232,.11);isolation:isolate;
+  background:radial-gradient(90% 70% at 85% 10%,rgba(0,217,163,.16),transparent 60%),linear-gradient(180deg,rgba(38,46,58,.62),rgba(23,28,38,.5));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 34px 70px -44px var(--shadow-tint);perspective:1000px;transition:border-color 500ms var(--ease-smooth)}
+[data-page="projekti"] .project-visual::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:6;opacity:0;
+  background:radial-gradient(320px circle at var(--px) var(--py),rgba(0,217,163,.14),transparent 70%);transition:opacity 500ms var(--ease-smooth)}
+[data-page="projekti"] .project-visual.is-live{border-color:rgba(0,217,163,.32)}
+[data-page="projekti"] .project-visual.is-live::after{opacity:1}
+[data-page="projekti"] .project-tag{border-radius:999px;padding:6px 12px;background:rgba(16,20,28,.72)}
+[data-page="projekti"] .device-desktop{border-radius:10px;overflow:hidden;will-change:transform}
+[data-page="projekti"] .device-mobile{will-change:transform}
+
+/* Buttons sit apart instead of touching; full width and stacked on phones. */
+.project-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:6px}
+@media(max-width:600px){.project-actions{flex-direction:column}.project-actions .btn{width:100%;justify-content:center}}
+@media(prefers-reduced-motion:reduce){[data-page="projekti"] .device-desktop,[data-page="projekti"] .device-mobile{transform:none!important}}
+
+/* Old price: a diagonal strike, so the line through "1" cannot read as "4". */
+.offer-price del{position:relative;text-decoration:none}
+.offer-price del::after{content:"";position:absolute;left:-6%;right:-6%;top:50%;height:2px;background:var(--paper-dim);border-radius:2px;transform:rotate(-14deg);transform-origin:center}
+.launch-offer .offer-price del::after{transform:rotate(-14deg);transform-origin:center}
+@keyframes offer-strike{from{transform:rotate(-14deg) scaleX(0)}to{transform:rotate(-14deg) scaleX(1)}}
+
+/* ==========================================================================
+   Round 11: portfolio spacing, Usluge dropdown, service pages in glass.
+   ========================================================================== */
+:root{--glass-fill:linear-gradient(180deg,rgba(38,46,58,.62),rgba(23,28,38,.5));--glass-glow:radial-gradient(90% 60% at 100% 0%,rgba(0,217,163,.12),transparent 62%)}
+
+/* Portfolio: Integraq sits closer to the page heading. */
+[data-page="projekti"] .page-hero{padding-bottom:36px;border-bottom:0}
+[data-page="projekti"] .page-hero + .section-pad{padding-top:12px}
+[data-page="projekti"] .portfolio-list .project-row:first-child{border-top:0;padding-top:24px}
+@media(max-width:600px){[data-page="projekti"] .page-hero{padding-bottom:20px}[data-page="projekti"] .page-hero + .section-pad{padding-top:0}}
+
+/* Usluge dropdown (desktop): the menu no longer clips the invisible bridge
+   between the trigger and the menu, so moving the mouse down keeps it open;
+   it also waits a moment before closing. */
+@media(min-width:1101px){
+  .dropdown-menu{overflow:visible;border-radius:14px;
+    background:linear-gradient(180deg,rgba(38,46,58,.86),rgba(18,23,31,.92));-webkit-backdrop-filter:blur(20px) saturate(150%);backdrop-filter:blur(20px) saturate(150%);
+    border:1px solid rgba(242,239,232,.12);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 28px 60px -24px rgba(0,0,0,.7);padding:6px;
+    transition:opacity 220ms var(--ease-out) 160ms,transform 260ms var(--ease-smooth) 160ms,visibility 0s linear 420ms!important}
+  .nav-item:hover .dropdown-menu,.nav-item:focus-within .dropdown-menu,.nav-item.open .dropdown-menu{
+    transition:opacity 220ms var(--ease-out),transform 260ms var(--ease-smooth),visibility 0s!important}
+  .dropdown-menu li a{border-radius:10px;border-bottom:0}
+  .dropdown-menu li + li{margin-top:2px}
+  .nav-item .dropdown-menu::before{height:30px;bottom:100%}
+}
+@media(min-width:1101px) and (hover:hover) and (pointer:fine){.nav-item:focus-within .dropdown-menu{opacity:1;visibility:visible;transform:none}}
+
+/* Service pages: glass surfaces for every block. */
+.feature-grid{gap:16px;background:none;border:0}
+.feature-card,.status-panel,.terminal-panel,.hero-visual,.device-row,.service-note{
+  background:var(--glass-glow),var(--glass-fill);border:1px solid rgba(242,239,232,.11);border-radius:20px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 30px 60px -44px var(--shadow-tint)}
+.feature-card{position:relative;overflow:hidden;transition:border-color 500ms var(--ease-smooth),translate 600ms var(--ease-smooth)}
+.hero-visual{overflow:hidden}
+.hero-visual svg rect:first-child{fill:transparent}
+.terminal-panel,.status-panel{overflow:hidden}
+.terminal-bar{background:rgba(27,33,45,.7)}
+.device-rows{border-top:0;display:flex;flex-direction:column;gap:14px}
+.device-row{padding:26px 28px;border-bottom:1px solid rgba(242,239,232,.11)}
+.device-row-icon{border-radius:16px;background:rgba(0,217,163,.08)}
+.status-badge{border-radius:999px}
+.service-note{padding:18px 22px;border-left:1px solid rgba(242,239,232,.11)}
+.related-list{gap:14px;background:none;border:0}
+.related-item{background:var(--glass-fill);border:1px solid rgba(242,239,232,.11);border-radius:16px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);transition:border-color 450ms var(--ease-smooth),background-color 450ms var(--ease-smooth)}
+.related-item .arrow{transition:transform 500ms var(--ease-smooth)}
+@media (hover:hover) and (pointer:fine){
+  .feature-card:hover,.device-row:hover{border-color:rgba(0,217,163,.35)}
+  .feature-card:hover{translate:0 -4px;transform:none}
+  .related-item:hover{border-color:rgba(0,217,163,.4);background:var(--glass-glow),var(--glass-fill)}
+  .related-item:hover .arrow{transform:translateX(5px)}
+}
+html.scroll-reveals .feature-card.reveal{transition:opacity var(--dur-reveal) var(--ease-out),transform var(--dur-reveal) var(--ease-out),translate 600ms var(--ease-smooth),border-color 500ms var(--ease-smooth)!important;
+  transition-delay:var(--reveal-delay,0ms),var(--reveal-delay,0ms),0ms,0ms!important}
+
+/* "Izrada web sajtova": the included-items checklist panel. */
+.practice-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:56px;align-items:start}
+.practice-head{margin-bottom:0}
+.practice-list{list-style:none;margin:0;padding:8px 28px;border-radius:22px;border:1px solid rgba(242,239,232,.11);
+  background:radial-gradient(80% 50% at 100% 0%,rgba(0,217,163,.14),transparent 62%),var(--glass-fill);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 34px 70px -44px var(--shadow-tint)}
+.practice-list li{display:grid;grid-template-columns:36px minmax(0,1fr);gap:16px;padding:24px 0;border-top:1px solid rgba(242,239,232,.08)}
+.practice-list li:first-child{border-top:0}
+.practice-icon{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;color:var(--signal);background:rgba(0,217,163,.12);border:1px solid rgba(0,217,163,.3)}
+.practice-list h3{font:600 18px/1.3 var(--display);letter-spacing:-.01em;margin-bottom:6px}
+.practice-list p{color:var(--paper-dim);font-size:15px;line-height:1.7}
+@media(max-width:900px){.practice-grid{grid-template-columns:1fr;gap:28px}.practice-list{padding:4px 20px}}
+
+/* ==========================================================================
+   Round 12: service-specific sections and motion on the glass blocks.
+   Motion rules: entrances play once when a block scrolls in (strong
+   ease-out, 40-80ms stagger, transform/opacity/clip-path only); hover is
+   gated to real pointers; reduced motion shows the final state. Entrances
+   are light CSS, so they also play in static (low-power) mode.
+   ========================================================================== */
+
+/* --- Shared glass block + pointer edge light (experience.js sets --px/--py) */
+.screen-check,.duty-col,.seo-timeline{border:1px solid rgba(242,239,232,.11);border-radius:20px;
+  background:var(--glass-glow),var(--glass-fill);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 30px 60px -44px var(--shadow-tint)}
+.glass-edge{position:relative;isolation:isolate}
+.glass-edge::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;z-index:3;opacity:0;
+  background:radial-gradient(240px circle at var(--px) var(--py),rgba(0,217,163,.9),rgba(0,217,163,.3) 35%,transparent 65%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
+  transition:opacity 450ms var(--ease-smooth)}
+@media (hover:hover) and (pointer:fine){.glass-edge:hover::after{opacity:1}}
+
+/* --- Responzivan dizajn: screen-width ruler + list ------------------------ */
+.screen-check{padding:28px}
+.screen-ruler{position:relative;display:flex;gap:6px;height:44px;margin-bottom:26px;overflow:hidden;border-radius:12px}
+.screen-ruler i{flex:0 0 var(--w);display:flex;align-items:flex-end;padding:0 10px 7px;border-radius:10px;font:500 11px var(--mono);font-style:normal;color:var(--paper-dim);
+  background:rgba(242,239,232,.05);border:1px solid rgba(242,239,232,.08);transition:background-color 400ms var(--ease-smooth),color 400ms var(--ease-smooth),border-color 400ms var(--ease-smooth)}
+.screen-scan{position:absolute;inset:0;opacity:0;z-index:2;pointer-events:none}.screen-scan::before{content:"";position:absolute;top:0;bottom:0;left:0;width:3px;border-radius:3px;background:var(--signal);box-shadow:0 0 18px 2px rgba(0,217,163,.6)}
+.screen-list{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.screen-list li{padding:18px;border-radius:14px;background:rgba(10,14,20,.35);border:1px solid rgba(242,239,232,.07);transition:border-color 400ms var(--ease-smooth),background-color 400ms var(--ease-smooth),translate 500ms var(--ease-smooth)}
+.screen-size{display:block;font:500 11px var(--mono);letter-spacing:.06em;color:var(--signal);margin-bottom:10px}
+.screen-list h3{font:600 17px/1.3 var(--display);margin-bottom:6px}
+.screen-list p{font-size:14px;line-height:1.6;color:var(--paper-dim)}
+@media (hover:hover) and (pointer:fine){
+  .screen-list li:hover{border-color:rgba(0,217,163,.35);background:rgba(0,217,163,.06);translate:0 -3px}
+  .screen-check:has(.screen-list li:nth-child(1):hover) .screen-ruler i:nth-of-type(1),
+  .screen-check:has(.screen-list li:nth-child(2):hover) .screen-ruler i:nth-of-type(2),
+  .screen-check:has(.screen-list li:nth-child(3):hover) .screen-ruler i:nth-of-type(3),
+  .screen-check:has(.screen-list li:nth-child(4):hover) .screen-ruler i:nth-of-type(4){background:rgba(0,217,163,.16);border-color:rgba(0,217,163,.5);color:var(--paper)}
+}
+@media(max-width:900px){.screen-list{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.screen-list{grid-template-columns:1fr}.screen-check{padding:18px}.screen-ruler i{font-size:10px;padding:0 6px 6px}}
+html.scroll-reveals .screen-check.in .screen-scan{animation:svc-scan 1500ms var(--ease-in-out) 350ms both!important}
+html.scroll-reveals .screen-check.in .screen-ruler i{animation:svc-light 900ms var(--ease-out) both!important}
+html.scroll-reveals .screen-check.in .screen-ruler i:nth-of-type(1){animation-delay:500ms!important}
+html.scroll-reveals .screen-check.in .screen-ruler i:nth-of-type(2){animation-delay:780ms!important}
+html.scroll-reveals .screen-check.in .screen-ruler i:nth-of-type(3){animation-delay:1060ms!important}
+html.scroll-reveals .screen-check.in .screen-ruler i:nth-of-type(4){animation-delay:1300ms!important}
+html.scroll-reveals .screen-check.in .screen-list li{animation:svc-rise 560ms var(--ease-out) both!important}
+html.scroll-reveals .screen-check.in .screen-list li:nth-child(2){animation-delay:70ms!important}
+html.scroll-reveals .screen-check.in .screen-list li:nth-child(3){animation-delay:140ms!important}
+html.scroll-reveals .screen-check.in .screen-list li:nth-child(4){animation-delay:210ms!important}
+@keyframes svc-scan{0%{opacity:0;transform:translateX(0)}10%{opacity:1}90%{opacity:1}100%{opacity:0;transform:translateX(100%)}}
+@keyframes svc-light{0%{background:rgba(242,239,232,.05)}40%{background:rgba(0,217,163,.22);border-color:rgba(0,217,163,.55);color:var(--paper)}100%{}}
+@keyframes svc-rise{from{opacity:0;transform:translateY(12px)}}
+
+/* --- Web hosting: who does what ------------------------------------------- */
+.duty-split{display:grid;grid-template-columns:minmax(0,1fr) 56px minmax(0,1fr);align-items:stretch}
+.duty-col{padding:26px 26px 22px}
+.duty-label{display:inline-block;font:500 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--signal);padding:5px 12px;border:1px solid rgba(0,217,163,.35);border-radius:999px;margin-bottom:16px}
+.duty-label.amber{color:var(--amber);border-color:rgba(255,182,72,.35)}
+.duty-col ul{list-style:none}
+.duty-col li{position:relative;padding:12px 0 12px 22px;border-top:1px solid rgba(242,239,232,.07);font-size:15px;line-height:1.6;color:var(--paper)}
+.duty-col li:first-child{border-top:0}
+.duty-col li::before{content:'';position:absolute;left:0;top:21px;width:8px;height:8px;border-radius:50%;background:var(--signal);box-shadow:0 0 0 4px rgba(0,217,163,.12)}
+.duty-col:last-child li::before{background:var(--amber);box-shadow:0 0 0 4px rgba(255,182,72,.12)}
+.duty-link{position:relative;display:grid;place-items:center}
+.duty-link span{display:block;width:100%;height:2px;background:linear-gradient(90deg,var(--signal),var(--amber));border-radius:2px;transform-origin:left}
+@media(max-width:760px){.duty-split{grid-template-columns:1fr;gap:0}.duty-link{height:36px}.duty-link span{width:2px;height:100%;background:linear-gradient(180deg,var(--signal),var(--amber));transform-origin:top}}
+html.scroll-reveals .duty-split.in .duty-col{animation:svc-rise 560ms var(--ease-out) both!important}
+html.scroll-reveals .duty-split.in .duty-col:last-child{animation-delay:420ms!important}
+html.scroll-reveals .duty-split.in .duty-link span{animation:svc-draw 520ms var(--ease-in-out) 200ms both!important}
+html.scroll-reveals .duty-split.in .duty-col li{animation:svc-rise 460ms var(--ease-out) both!important}
+html.scroll-reveals .duty-split.in .duty-col:first-child li:nth-child(1){animation-delay:120ms!important}
+html.scroll-reveals .duty-split.in .duty-col:first-child li:nth-child(2){animation-delay:180ms!important}
+html.scroll-reveals .duty-split.in .duty-col:first-child li:nth-child(3){animation-delay:240ms!important}
+html.scroll-reveals .duty-split.in .duty-col:last-child li:nth-child(1){animation-delay:520ms!important}
+html.scroll-reveals .duty-split.in .duty-col:last-child li:nth-child(2){animation-delay:580ms!important}
+html.scroll-reveals .duty-split.in .duty-col:last-child li:nth-child(3){animation-delay:640ms!important}
+@keyframes svc-draw{from{transform:scaleX(0)}}
+@media(max-width:760px){html.scroll-reveals .duty-split.in .duty-link span{animation-name:svc-draw-y!important}}
+
+/* --- SEO: timeline -------------------------------------------------------- */
+.seo-timeline{list-style:none;position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;padding:30px 28px 28px}
+.seo-timeline::before{content:'';position:absolute;left:46px;right:46px;top:40px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--signal),rgba(0,217,163,.25));transform-origin:left}
+.seo-timeline li{position:relative;padding-top:34px}
+.seo-dot{position:absolute;top:2px;left:10px;width:14px;height:14px;border-radius:50%;background:var(--ink);border:2px solid var(--signal);box-shadow:0 0 0 5px rgba(0,217,163,.12)}
+.seo-when{display:block;font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--signal);margin-bottom:8px}
+.seo-timeline h3{font:600 18px/1.3 var(--display);margin-bottom:6px}
+.seo-timeline p{font-size:14.5px;line-height:1.65;color:var(--paper-dim)}
+@media(max-width:760px){.seo-timeline{grid-template-columns:1fr;gap:22px;padding-left:24px}.seo-timeline::before{left:41px;right:auto;top:36px;bottom:36px;width:2px;height:auto;transform-origin:top}
+  .seo-timeline li{padding:0 0 0 38px}.seo-dot{top:4px;left:4px}}
+html.scroll-reveals .seo-timeline.in::before{animation:svc-draw 900ms var(--ease-in-out) 200ms both!important}
+html.scroll-reveals .seo-timeline.in .seo-dot{animation:svc-pop 420ms var(--ease-out) both!important}
+html.scroll-reveals .seo-timeline.in li:nth-child(1) .seo-dot{animation-delay:200ms!important}
+html.scroll-reveals .seo-timeline.in li:nth-child(2) .seo-dot{animation-delay:520ms!important}
+html.scroll-reveals .seo-timeline.in li:nth-child(3) .seo-dot{animation-delay:840ms!important}
+html.scroll-reveals .seo-timeline.in li>:not(.seo-dot){animation:svc-rise 520ms var(--ease-out) both!important}
+html.scroll-reveals .seo-timeline.in li:nth-child(1)>:not(.seo-dot){animation-delay:260ms!important}
+html.scroll-reveals .seo-timeline.in li:nth-child(2)>:not(.seo-dot){animation-delay:580ms!important}
+html.scroll-reveals .seo-timeline.in li:nth-child(3)>:not(.seo-dot){animation-delay:900ms!important}
+@keyframes svc-pop{from{opacity:0;transform:scale(.6)}}
+@media(max-width:760px){html.scroll-reveals .seo-timeline.in::before{animation-name:svc-draw-y!important}}
+@keyframes svc-draw-y{from{transform:scaleY(0)}}
+
+/* --- Existing glass blocks on the service pages: entrances + hover ------- */
+/* Hosting status panel: lamps switch on one after another. */
+html.scroll-reveals .status-panel.in .status-led{animation:svc-led 700ms var(--ease-out) both!important}
+html.scroll-reveals .status-panel.in .status-item:nth-child(1) .status-led{animation-delay:250ms!important}
+html.scroll-reveals .status-panel.in .status-item:nth-child(2) .status-led{animation-delay:450ms!important}
+html.scroll-reveals .status-panel.in .status-item:nth-child(3) .status-led{animation-delay:650ms!important}
+@keyframes svc-led{0%{opacity:.25;transform:scale(.7);box-shadow:0 0 0 0 rgba(0,217,163,0)}60%{opacity:1;transform:scale(1.15);box-shadow:0 0 0 9px rgba(0,217,163,.18)}100%{}}
+.status-item{transition:background-color 400ms var(--ease-smooth)}
+/* SEO terminal: each line types in from the left, then its check appears. */
+html.scroll-reveals .terminal-panel.in .terminal-line{animation:svc-type 620ms var(--ease-out) both!important}
+html.scroll-reveals .terminal-panel.in .terminal-line .t-check{animation:svc-pop 380ms var(--ease-out) both!important}
+html.scroll-reveals .terminal-panel.in .terminal-line:nth-child(1),html.scroll-reveals .terminal-panel.in .terminal-line:nth-child(1) .t-check{animation-delay:150ms!important}
+html.scroll-reveals .terminal-panel.in .terminal-line:nth-child(2){animation-delay:330ms!important}
+html.scroll-reveals .terminal-panel.in .terminal-line:nth-child(3){animation-delay:510ms!important}
+html.scroll-reveals .terminal-panel.in .terminal-line:nth-child(4){animation-delay:690ms!important}
+html.scroll-reveals .terminal-panel.in .terminal-line:nth-child(1) .t-check{animation-delay:620ms!important}
+html.scroll-reveals .terminal-panel.in .terminal-line:nth-child(2) .t-check{animation-delay:800ms!important}
+html.scroll-reveals .terminal-panel.in .terminal-line:nth-child(3) .t-check{animation-delay:980ms!important}
+html.scroll-reveals .terminal-panel.in .terminal-line:nth-child(4) .t-check{animation-delay:1160ms!important}
+@keyframes svc-type{from{clip-path:inset(0 100% 0 0);opacity:.4}}
+.terminal-line{transition:background-color 400ms var(--ease-smooth)}
+/* Responsive rows: rows rise in turn, icons settle in. */
+html.scroll-reveals .device-rows.in .device-row{animation:svc-rise 560ms var(--ease-out) both!important}
+html.scroll-reveals .device-rows.in .device-row:nth-child(2){animation-delay:80ms!important}
+html.scroll-reveals .device-rows.in .device-row:nth-child(3){animation-delay:160ms!important}
+html.scroll-reveals .device-rows.in .device-row-icon{animation:svc-pop 520ms var(--ease-out) both!important}
+html.scroll-reveals .device-rows.in .device-row:nth-child(1) .device-row-icon{animation-delay:150ms!important}
+html.scroll-reveals .device-rows.in .device-row:nth-child(2) .device-row-icon{animation-delay:230ms!important}
+html.scroll-reveals .device-rows.in .device-row:nth-child(3) .device-row-icon{animation-delay:310ms!important}
+.device-row,.device-row-icon{transition:border-color 450ms var(--ease-smooth),translate 550ms var(--ease-smooth),rotate 550ms var(--ease-smooth),background-color 450ms var(--ease-smooth)}
+/* Izrada sajtova: checklist ticks draw in. */
+html.scroll-reveals .practice-list.in .practice-icon{animation:svc-pop 420ms var(--ease-out) both!important}
+html.scroll-reveals .practice-list.in li:nth-child(1) .practice-icon{animation-delay:200ms!important}
+html.scroll-reveals .practice-list.in li:nth-child(2) .practice-icon{animation-delay:340ms!important}
+html.scroll-reveals .practice-list.in li:nth-child(3) .practice-icon{animation-delay:480ms!important}
+html.scroll-reveals .feature-grid .feature-card.in .feature-num{animation:svc-rise 500ms var(--ease-out) 150ms both!important}
+
+/* Entrances must finish even when decorative motion is paused/static. */
+.motion-paused :is(.screen-check,.duty-split,.seo-timeline,.status-panel,.terminal-panel,.device-rows,.practice-list,.feature-card) *,
+.motion-paused :is(.screen-check,.seo-timeline)::before{animation-play-state:running!important}
+.motion-paused .seo-timeline::before{animation-play-state:running!important}
+
+/* Hover (mouse only). */
+@media (hover:hover) and (pointer:fine){
+  .status-item:hover,.terminal-line:hover{background:rgba(0,217,163,.05)}
+  .device-row:hover{border-color:rgba(0,217,163,.35);translate:4px 0}
+  .device-row:hover .device-row-icon{rotate:-4deg;translate:0 -2px;background:rgba(0,217,163,.14)}
+  .duty-col:hover{border-color:rgba(0,217,163,.3)}
+  .practice-list li:hover .practice-icon{background:rgba(0,217,163,.22)}
+}
+
+@media(prefers-reduced-motion:reduce){
+  html.scroll-reveals.scroll-reveals.scroll-reveals.scroll-reveals.scroll-reveals.scroll-reveals :is(.screen-check,.duty-split,.seo-timeline,.status-panel,.terminal-panel,.device-rows,.practice-list,.feature-grid) *,
+  html.scroll-reveals.scroll-reveals.scroll-reveals.scroll-reveals.scroll-reveals.scroll-reveals .seo-timeline::before{animation:none!important}
+  .device-row:hover,.device-row:hover .device-row-icon,.screen-list li:hover{translate:none;rotate:none}
+}
+@media(max-width:760px){.seo-timeline::before{left:34px}}
+
+/* ==========================================================================
+   Round 13: width bars, website and search illustrations, glass mobile
+   navbar, popup price animation. Demo motion is light CSS: it runs in static
+   mode too, stops with the pause button and is off for reduced motion.
+   ========================================================================== */
+
+/* --- Service hero illustrations: note sits under the picture, not on it --- */
+.hero-visual{display:flex;flex-direction:column}
+.hero-visual>svg,.hero-visual>.site-demo,.hero-visual>.serp-demo{flex:1 1 auto;min-height:0}
+.hero-visual .illustration-note{position:static!important;background:none!important;margin:0!important;padding:10px 18px 14px!important;font-size:10px;max-width:none}
+
+/* --- Responsive: bars proportional to the real screen widths -------------- */
+.screen-ruler{flex-direction:column;align-items:flex-start;height:auto;gap:7px;overflow:visible;border-radius:0}
+.screen-ruler i{flex:none;width:var(--w);height:24px;padding:0 10px;align-items:center;justify-content:flex-end;border-radius:8px}
+.screen-ruler b{font:500 11px var(--mono);color:inherit}
+html.scroll-reveals .screen-check.in .screen-ruler i{animation:svc-type 700ms var(--ease-out) both!important}
+
+/* --- Izrada: example website on a computer and a phone (glass) ------------ */
+.site-demo{position:relative;padding:8% 7% 9%;perspective:1000px}
+.sd-browser{position:relative;container-type:inline-size;border-radius:12px;overflow:hidden;border:1px solid rgba(242,239,232,.16);
+  background:rgba(16,20,28,.86);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 30px 60px -24px rgba(0,0,0,.6);will-change:transform}
+.sd-bar{display:flex;align-items:center;gap:5px;padding:8px 10px;background:rgba(27,33,45,.85);border-bottom:1px solid rgba(255,255,255,.06)}
+.sd-bar i{width:7px;height:7px;border-radius:50%;background:#55606a}.sd-bar i:first-child{background:var(--amber)}.sd-bar i:nth-child(2){background:var(--signal)}
+.sd-bar span{margin:auto;padding:3px 12px;border-radius:999px;background:rgba(255,255,255,.05);font:9px var(--mono);color:var(--paper-dim)}
+.sd-viewport{height:62cqw;overflow:hidden}
+.sd-page{padding:5cqw 5.5cqw}
+.sd-nav{display:flex;align-items:center;justify-content:space-between;font:700 3.4cqw var(--display);color:var(--paper)}
+.sd-nav span{display:flex;gap:2.4cqw}.sd-nav span i{width:7cqw;height:1.2cqw;border-radius:1cqw;background:#f2efe840}
+.sd-nav em{width:12cqw;height:4cqw;border-radius:2cqw;background:var(--signal)}
+.sd-hero{display:grid;grid-template-columns:1.15fr 1fr;gap:5cqw;align-items:center;margin-top:6cqw}
+.sd-copy small{display:block;font:500 1.9cqw var(--mono);letter-spacing:.12em;color:var(--signal)}
+.sd-copy strong{display:block;margin-top:2.4cqw;font:700 6.4cqw/1.04 var(--display);letter-spacing:-.03em;color:var(--paper)}
+.sd-copy strong span,.sd-copy strong em{display:block}.sd-copy strong em{font-style:normal;color:var(--signal)}
+.sd-line{display:block;height:1cqw;width:90%;margin-top:2.6cqw;border-radius:1cqw;background:#c9c6bd40}.sd-line.short{width:60%;margin-top:1.6cqw}
+.sd-cta{display:inline-block;margin-top:3.6cqw;padding:1.8cqw 3.6cqw;border-radius:1.4cqw;background:var(--signal);color:var(--ink);font:600 2.4cqw var(--body)}
+.sd-img{aspect-ratio:4/5;border-radius:2.4cqw;background:radial-gradient(circle at 68% 30%,#ffd9a0 0 10%,transparent 11%),radial-gradient(60% 50% at 50% 100%,#0e4a40,transparent 70%),linear-gradient(160deg,#243444,#13262a 60%,#0a3a30)}
+.sd-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:3cqw;margin-top:7cqw}
+.sd-cards i{height:14cqw;border-radius:2cqw;border:1px solid #00d9a333;background:#00d9a30d}
+.sd-gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:2cqw;margin-top:4cqw}
+.sd-gallery i{aspect-ratio:1;border-radius:1.6cqw;background:linear-gradient(150deg,#2a3848,#14202a)}
+.sd-gallery i:nth-child(2){background:linear-gradient(150deg,#14453c,#10262a)}.sd-gallery i:nth-child(3){background:linear-gradient(150deg,#4a3a24,#1d1a18)}
+.sd-footer{height:12cqw;margin-top:5cqw;border-radius:2cqw;background:rgba(255,255,255,.04)}
+.sd-phone{position:absolute;right:3%;bottom:4%;width:23%;container-type:inline-size;padding:3.5%;aspect-ratio:9/18.5;border-radius:18%/9%;
+  background:rgba(11,15,21,.92);border:1px solid #4b6266;box-shadow:0 26px 50px -16px rgba(0,0,0,.7);will-change:transform}
+.sd-phone-screen{height:100%;padding:12cqw 9cqw;border-radius:14%/7%;background:#10141c;overflow:hidden}
+.sd-phone-screen b{display:block;font:700 10cqw var(--display);color:var(--paper)}
+.sd-phone-screen strong{display:block;margin-top:14cqw;font:700 14cqw/1.05 var(--display);color:var(--paper)}
+.sd-phone-screen strong span,.sd-phone-screen strong em{display:block}.sd-phone-screen strong em{font-style:normal;color:var(--signal)}
+.sd-phone-screen .sd-cta{display:block;width:60%;height:12cqw;padding:0;margin-top:10cqw;border-radius:4cqw}
+.sd-phone-screen .sd-img{display:block;aspect-ratio:auto;height:60cqw;margin-top:12cqw;border-radius:6cqw}
+/* Entrance once, then the page inside the browser scrolls slowly up and back. */
+html.scroll-reveals .hero-visual.in .sd-browser{animation:svc-rise 700ms var(--ease-out) 100ms both!important}
+html.scroll-reveals .hero-visual.in .sd-nav{animation:svc-rise 500ms var(--ease-out) 450ms both!important}
+html.scroll-reveals .hero-visual.in .sd-copy>*{animation:b-rise 560ms var(--ease-out) both!important}
+html.scroll-reveals .hero-visual.in .sd-copy>:nth-child(1){animation-delay:560ms!important}
+html.scroll-reveals .hero-visual.in .sd-copy>:nth-child(2){animation-delay:640ms!important}
+html.scroll-reveals .hero-visual.in .sd-copy>:nth-child(3){animation-delay:760ms!important}
+html.scroll-reveals .hero-visual.in .sd-copy>:nth-child(4){animation-delay:820ms!important}
+html.scroll-reveals .hero-visual.in .sd-copy>:nth-child(5){animation-delay:900ms!important}
+html.scroll-reveals .hero-visual.in .sd-browser .sd-img{animation:b-wipe 800ms var(--ease-in-out) 600ms both!important}
+html.scroll-reveals .hero-visual.in .sd-cards i{animation:svc-rise 480ms var(--ease-out) both!important}
+html.scroll-reveals .hero-visual.in .sd-cards i:nth-child(1){animation-delay:1000ms!important}
+html.scroll-reveals .hero-visual.in .sd-cards i:nth-child(2){animation-delay:1060ms!important}
+html.scroll-reveals .hero-visual.in .sd-cards i:nth-child(3){animation-delay:1120ms!important}
+html.scroll-reveals .hero-visual.in .sd-phone{animation:b-phone 700ms var(--ease-out) 1300ms both!important}
+html.scroll-reveals .hero-visual.in .sd-page{animation:sd-scroll 14s var(--ease-in-out) 3.2s infinite!important}
+@keyframes sd-scroll{0%,18%{transform:none}48%,70%{transform:translateY(-38%)}100%{transform:none}}
+
+/* --- SEO: search where the client's site moves to first place ------------- */
+.serp-demo{display:flex;flex-direction:column;gap:12px;padding:7% 7% 6%}
+.serp-engine{display:flex;align-items:center;gap:8px;font:600 13px var(--display);color:var(--paper-dim)}
+.serp-logo{display:flex;gap:3px}.serp-logo i{width:8px;height:8px;border-radius:50%;background:var(--signal)}.serp-logo i:nth-child(2){background:var(--amber)}.serp-logo i:nth-child(3){background:#7aa7ff}
+.serp-bar{display:flex;align-items:center;gap:10px;padding:11px 16px;border-radius:999px;color:var(--paper-dim);
+  background:rgba(10,14,20,.55);border:1px solid rgba(242,239,232,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.serp-query{position:relative;flex:0 1 auto;overflow:hidden;white-space:nowrap;font:500 13px var(--body);color:var(--paper)}
+.serp-typed{display:inline-block}
+.serp-caret{width:1.5px;height:16px;background:var(--signal);margin-left:-8px}
+.serp-results{list-style:none;display:flex;flex-direction:column;gap:8px;margin:2px 0 0}
+.serp-r{position:relative;height:58px;padding:9px 14px;border-radius:12px;background:rgba(242,239,232,.04);border:1px solid rgba(242,239,232,.08);overflow:hidden}
+.serp-url{display:block;font:500 10.5px var(--mono);color:#7fd8b8}
+.serp-r b{display:block;margin-top:3px;font:600 13px var(--display);color:#9fb7ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.serp-r i{display:block;width:70%;height:4px;margin-top:6px;border-radius:3px;background:#c9c6bd30}
+.serp-badge{position:absolute;right:12px;top:50%;translate:0 -50%;padding:3px 9px;border-radius:999px;background:var(--signal);color:var(--ink);font:700 11px var(--mono)}
+/* Final state (also for reduced motion): your site first, highlighted. */
+.serp-you{transform:translateY(calc(-200% - 16px));border-color:rgba(0,217,163,.55);background:rgba(0,217,163,.1);box-shadow:0 10px 30px -14px rgba(0,217,163,.6)}
+.serp-a,.serp-b{transform:translateY(calc(100% + 8px))}
+.serp-you b{color:var(--paper)}
+/* Loop: type the query, show results, move the client's result to the top. */
+html.scroll-reveals .hero-visual.in .serp-typed{animation:serp-type 10s steps(24,end) infinite!important}
+html.scroll-reveals .hero-visual.in .serp-caret{animation:serp-caret 10s linear infinite!important}
+html.scroll-reveals .hero-visual.in .serp-results{animation:serp-list 10s var(--ease-out) infinite!important}
+html.scroll-reveals .hero-visual.in .serp-you{animation:serp-up 10s var(--ease-in-out) infinite!important}
+html.scroll-reveals .hero-visual.in .serp-a,html.scroll-reveals .hero-visual.in .serp-b{animation:serp-down 10s var(--ease-in-out) infinite!important}
+html.scroll-reveals .hero-visual.in .serp-badge{animation:serp-badge 10s var(--ease-out) infinite!important}
+@keyframes serp-type{0%{clip-path:inset(0 100% 0 0)}22%,100%{clip-path:inset(0 0 0 0)}}
+@keyframes serp-caret{0%,24%{opacity:1}26%,100%{opacity:0}}
+@keyframes serp-list{0%,25%{opacity:0;transform:translateY(8px)}32%,88%{opacity:1;transform:none}96%,100%{opacity:0;transform:none}}
+@keyframes serp-up{0%,40%{transform:none;border-color:rgba(242,239,232,.08);background:rgba(242,239,232,.04);box-shadow:none}
+  56%,100%{transform:translateY(calc(-200% - 16px));border-color:rgba(0,217,163,.55);background:rgba(0,217,163,.1);box-shadow:0 10px 30px -14px rgba(0,217,163,.6)}}
+@keyframes serp-down{0%,40%{transform:none}56%,100%{transform:translateY(calc(100% + 8px))}}
+@keyframes serp-badge{0%,56%{opacity:0;scale:.6}62%,100%{opacity:1;scale:1}}
+
+/* Demo loops stop with the pause button; reduced motion shows the final state. */
+.motion-paused :is(.site-demo,.serp-demo) *,.motion-paused .site-demo,.motion-paused .serp-demo{animation-play-state:running!important}
+html.user-paused.scroll-reveals .hero-visual.in :is(.sd-page,.serp-typed,.serp-caret,.serp-results,.serp-you,.serp-a,.serp-b,.serp-badge){animation:none!important}
+@media(prefers-reduced-motion:reduce){
+  html.scroll-reveals.scroll-reveals.scroll-reveals .hero-visual.in :is(.site-demo,.serp-demo) *{animation:none!important}
+  .sd-browser,.sd-phone{transform:none!important}
+}
+@media(max-width:600px){.serp-r{height:54px}.serp-r b{font-size:12px}}
+
+/* --- Mobile navbar: glass bar and a glass menu sheet ---------------------- */
+header,.performance-static header{background:rgba(16,20,28,.58);-webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%);
+  box-shadow:inset 0 -1px 0 rgba(242,239,232,.06)}
+@media(max-width:1100px){
+  .nav-links.mobile-open{left:12px;right:12px;top:calc(var(--nav-h,68px) + 8px);max-height:calc(100dvh - var(--nav-h,68px) - 24px);padding:8px;gap:2px;
+    border:1px solid rgba(242,239,232,.12);border-radius:20px;
+    background:linear-gradient(180deg,rgba(32,40,52,.82),rgba(16,20,28,.9));-webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 30px 70px -20px rgba(0,0,0,.7)}
+  .nav-links.mobile-open>li{padding:0}
+  .nav-links.mobile-open>li>a,.nav-links.mobile-open .dropdown-trigger{display:flex;width:100%;padding:14px 14px;border-radius:12px;font-size:16px;color:var(--paper);transition:background-color 300ms var(--ease-smooth)}
+  .nav-links.mobile-open>li>a:active,.nav-links.mobile-open .dropdown-trigger:active{background:rgba(0,217,163,.1)}
+  .nav-links.mobile-open a::after{display:none}
+  .nav-links.mobile-open .dropdown-menu{margin:2px 0 6px;padding:4px;border-radius:14px;background:rgba(10,14,20,.45);border:1px solid rgba(242,239,232,.07)}
+  .nav-links.mobile-open .dropdown-menu li a{padding:11px 12px;border-radius:10px}
+  .nav-links.mobile-open .dropdown-menu .dd-desc{font-size:12px}
+}
+@media(max-width:600px){:root{--nav-h:80px}}
+@media(prefers-reduced-transparency:reduce){header,.nav-links.mobile-open{-webkit-backdrop-filter:none;backdrop-filter:none;background:#10141c}}
+
+/* --- Popup: 160 is struck through, then 80 rises in ----------------------- */
+.offer-dialog.visible .offer-price del::after{animation:offer-strike 520ms var(--ease-out) 420ms both!important}
+.offer-dialog.visible .offer-price strong{display:inline-block;animation:offer-price 700ms var(--ease-out) 760ms both!important}
+.offer-dialog.visible .offer-price del{animation:popup-dim 500ms ease 700ms both!important}
+@keyframes popup-dim{to{opacity:.6}}
+@media(prefers-reduced-motion:reduce){.offer-dialog.visible .offer-price del::after,.offer-dialog.visible .offer-price strong,.offer-dialog.visible .offer-price del{animation:none!important}}
+
+/* Round 13 fixes: the general .hero-visual svg rule must not stretch the search icon; illustration boxes size to their content. */
+.hero-visual .serp-bar svg{width:16px!important;height:16px!important;flex:none}
+.hero-visual:has(.site-demo),.hero-visual:has(.serp-demo){aspect-ratio:auto}
+.sd-viewport{height:46cqw}
+.site-demo{padding:7% 7% 5%}
+@media(max-width:1100px){.nav-links.mobile-open{background:linear-gradient(180deg,rgba(30,38,50,.93),rgba(14,18,26,.96))}}
