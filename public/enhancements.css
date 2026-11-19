@@ -1086,3 +1086,162 @@ html.scroll-reveals .feature-card.reveal{transition:opacity var(--dur-reveal) va
 .practice-list h3{font:600 18px/1.3 var(--display);letter-spacing:-.01em;margin-bottom:6px}
 .practice-list p{color:var(--paper-dim);font-size:15px;line-height:1.7}
 @media(max-width:900px){.practice-grid{grid-template-columns:1fr;gap:28px}.practice-list{padding:4px 20px}}
+
+/* ==========================================================================
+   Round 12: service-specific sections and motion on the glass blocks.
+   Motion rules: entrances play once when a block scrolls in (strong
+   ease-out, 40-80ms stagger, transform/opacity/clip-path only); hover is
+   gated to real pointers; reduced motion shows the final state. Entrances
+   are light CSS, so they also play in static (low-power) mode.
+   ========================================================================== */
+
+/* --- Shared glass block + pointer edge light (experience.js sets --px/--py) */
+.screen-check,.duty-col,.seo-timeline{border:1px solid rgba(242,239,232,.11);border-radius:20px;
+  background:var(--glass-glow),var(--glass-fill);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 30px 60px -44px var(--shadow-tint)}
+.glass-edge{position:relative;isolation:isolate}
+.glass-edge::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;z-index:3;opacity:0;
+  background:radial-gradient(240px circle at var(--px) var(--py),rgba(0,217,163,.9),rgba(0,217,163,.3) 35%,transparent 65%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
+  transition:opacity 450ms var(--ease-smooth)}
+@media (hover:hover) and (pointer:fine){.glass-edge:hover::after{opacity:1}}
+
+/* --- Responzivan dizajn: screen-width ruler + list ------------------------ */
+.screen-check{padding:28px}
+.screen-ruler{position:relative;display:flex;gap:6px;height:44px;margin-bottom:26px;overflow:hidden;border-radius:12px}
+.screen-ruler i{flex:0 0 var(--w);display:flex;align-items:flex-end;padding:0 10px 7px;border-radius:10px;font:500 11px var(--mono);font-style:normal;color:var(--paper-dim);
+  background:rgba(242,239,232,.05);border:1px solid rgba(242,239,232,.08);transition:background-color 400ms var(--ease-smooth),color 400ms var(--ease-smooth),border-color 400ms var(--ease-smooth)}
+.screen-scan{position:absolute;inset:0;opacity:0;z-index:2;pointer-events:none}.screen-scan::before{content:"";position:absolute;top:0;bottom:0;left:0;width:3px;border-radius:3px;background:var(--signal);box-shadow:0 0 18px 2px rgba(0,217,163,.6)}
+.screen-list{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.screen-list li{padding:18px;border-radius:14px;background:rgba(10,14,20,.35);border:1px solid rgba(242,239,232,.07);transition:border-color 400ms var(--ease-smooth),background-color 400ms var(--ease-smooth),translate 500ms var(--ease-smooth)}
+.screen-size{display:block;font:500 11px var(--mono);letter-spacing:.06em;color:var(--signal);margin-bottom:10px}
+.screen-list h3{font:600 17px/1.3 var(--display);margin-bottom:6px}
+.screen-list p{font-size:14px;line-height:1.6;color:var(--paper-dim)}
+@media (hover:hover) and (pointer:fine){
+  .screen-list li:hover{border-color:rgba(0,217,163,.35);background:rgba(0,217,163,.06);translate:0 -3px}
+  .screen-check:has(.screen-list li:nth-child(1):hover) .screen-ruler i:nth-of-type(1),
+  .screen-check:has(.screen-list li:nth-child(2):hover) .screen-ruler i:nth-of-type(2),
+  .screen-check:has(.screen-list li:nth-child(3):hover) .screen-ruler i:nth-of-type(3),
+  .screen-check:has(.screen-list li:nth-child(4):hover) .screen-ruler i:nth-of-type(4){background:rgba(0,217,163,.16);border-color:rgba(0,217,163,.5);color:var(--paper)}
+}
+@media(max-width:900px){.screen-list{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.screen-list{grid-template-columns:1fr}.screen-check{padding:18px}.screen-ruler i{font-size:10px;padding:0 6px 6px}}
+html.scroll-reveals .screen-check.in .screen-scan{animation:svc-scan 1500ms var(--ease-in-out) 350ms both!important}
+html.scroll-reveals .screen-check.in .screen-ruler i{animation:svc-light 900ms var(--ease-out) both!important}
+html.scroll-reveals .screen-check.in .screen-ruler i:nth-of-type(1){animation-delay:500ms!important}
+html.scroll-reveals .screen-check.in .screen-ruler i:nth-of-type(2){animation-delay:780ms!important}
+html.scroll-reveals .screen-check.in .screen-ruler i:nth-of-type(3){animation-delay:1060ms!important}
+html.scroll-reveals .screen-check.in .screen-ruler i:nth-of-type(4){animation-delay:1300ms!important}
+html.scroll-reveals .screen-check.in .screen-list li{animation:svc-rise 560ms var(--ease-out) both!important}
+html.scroll-reveals .screen-check.in .screen-list li:nth-child(2){animation-delay:70ms!important}
+html.scroll-reveals .screen-check.in .screen-list li:nth-child(3){animation-delay:140ms!important}
+html.scroll-reveals .screen-check.in .screen-list li:nth-child(4){animation-delay:210ms!important}
+@keyframes svc-scan{0%{opacity:0;transform:translateX(0)}10%{opacity:1}90%{opacity:1}100%{opacity:0;transform:translateX(100%)}}
+@keyframes svc-light{0%{background:rgba(242,239,232,.05)}40%{background:rgba(0,217,163,.22);border-color:rgba(0,217,163,.55);color:var(--paper)}100%{}}
+@keyframes svc-rise{from{opacity:0;transform:translateY(12px)}}
+
+/* --- Web hosting: who does what ------------------------------------------- */
+.duty-split{display:grid;grid-template-columns:minmax(0,1fr) 56px minmax(0,1fr);align-items:stretch}
+.duty-col{padding:26px 26px 22px}
+.duty-label{display:inline-block;font:500 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--signal);padding:5px 12px;border:1px solid rgba(0,217,163,.35);border-radius:999px;margin-bottom:16px}
+.duty-label.amber{color:var(--amber);border-color:rgba(255,182,72,.35)}
+.duty-col ul{list-style:none}
+.duty-col li{position:relative;padding:12px 0 12px 22px;border-top:1px solid rgba(242,239,232,.07);font-size:15px;line-height:1.6;color:var(--paper)}
+.duty-col li:first-child{border-top:0}
+.duty-col li::before{content:'';position:absolute;left:0;top:21px;width:8px;height:8px;border-radius:50%;background:var(--signal);box-shadow:0 0 0 4px rgba(0,217,163,.12)}
+.duty-col:last-child li::before{background:var(--amber);box-shadow:0 0 0 4px rgba(255,182,72,.12)}
+.duty-link{position:relative;display:grid;place-items:center}
+.duty-link span{display:block;width:100%;height:2px;background:linear-gradient(90deg,var(--signal),var(--amber));border-radius:2px;transform-origin:left}
+@media(max-width:760px){.duty-split{grid-template-columns:1fr;gap:0}.duty-link{height:36px}.duty-link span{width:2px;height:100%;background:linear-gradient(180deg,var(--signal),var(--amber));transform-origin:top}}
+html.scroll-reveals .duty-split.in .duty-col{animation:svc-rise 560ms var(--ease-out) both!important}
+html.scroll-reveals .duty-split.in .duty-col:last-child{animation-delay:420ms!important}
+html.scroll-reveals .duty-split.in .duty-link span{animation:svc-draw 520ms var(--ease-in-out) 200ms both!important}
+html.scroll-reveals .duty-split.in .duty-col li{animation:svc-rise 460ms var(--ease-out) both!important}
+html.scroll-reveals .duty-split.in .duty-col:first-child li:nth-child(1){animation-delay:120ms!important}
+html.scroll-reveals .duty-split.in .duty-col:first-child li:nth-child(2){animation-delay:180ms!important}
+html.scroll-reveals .duty-split.in .duty-col:first-child li:nth-child(3){animation-delay:240ms!important}
+html.scroll-reveals .duty-split.in .duty-col:last-child li:nth-child(1){animation-delay:520ms!important}
+html.scroll-reveals .duty-split.in .duty-col:last-child li:nth-child(2){animation-delay:580ms!important}
+html.scroll-reveals .duty-split.in .duty-col:last-child li:nth-child(3){animation-delay:640ms!important}
+@keyframes svc-draw{from{transform:scaleX(0)}}
+@media(max-width:760px){html.scroll-reveals .duty-split.in .duty-link span{animation-name:svc-draw-y!important}}
+
+/* --- SEO: timeline -------------------------------------------------------- */
+.seo-timeline{list-style:none;position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;padding:30px 28px 28px}
+.seo-timeline::before{content:'';position:absolute;left:46px;right:46px;top:40px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--signal),rgba(0,217,163,.25));transform-origin:left}
+.seo-timeline li{position:relative;padding-top:34px}
+.seo-dot{position:absolute;top:2px;left:10px;width:14px;height:14px;border-radius:50%;background:var(--ink);border:2px solid var(--signal);box-shadow:0 0 0 5px rgba(0,217,163,.12)}
+.seo-when{display:block;font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--signal);margin-bottom:8px}
+.seo-timeline h3{font:600 18px/1.3 var(--display);margin-bottom:6px}
+.seo-timeline p{font-size:14.5px;line-height:1.65;color:var(--paper-dim)}
+@media(max-width:760px){.seo-timeline{grid-template-columns:1fr;gap:22px;padding-left:24px}.seo-timeline::before{left:41px;right:auto;top:36px;bottom:36px;width:2px;height:auto;transform-origin:top}
+  .seo-timeline li{padding:0 0 0 38px}.seo-dot{top:4px;left:4px}}
+html.scroll-reveals .seo-timeline.in::before{animation:svc-draw 900ms var(--ease-in-out) 200ms both!important}
+html.scroll-reveals .seo-timeline.in .seo-dot{animation:svc-pop 420ms var(--ease-out) both!important}
+html.scroll-reveals .seo-timeline.in li:nth-child(1) .seo-dot{animation-delay:200ms!important}
+html.scroll-reveals .seo-timeline.in li:nth-child(2) .seo-dot{animation-delay:520ms!important}
+html.scroll-reveals .seo-timeline.in li:nth-child(3) .seo-dot{animation-delay:840ms!important}
+html.scroll-reveals .seo-timeline.in li>:not(.seo-dot){animation:svc-rise 520ms var(--ease-out) both!important}
+html.scroll-reveals .seo-timeline.in li:nth-child(1)>:not(.seo-dot){animation-delay:260ms!important}
+html.scroll-reveals .seo-timeline.in li:nth-child(2)>:not(.seo-dot){animation-delay:580ms!important}
+html.scroll-reveals .seo-timeline.in li:nth-child(3)>:not(.seo-dot){animation-delay:900ms!important}
+@keyframes svc-pop{from{opacity:0;transform:scale(.6)}}
+@media(max-width:760px){html.scroll-reveals .seo-timeline.in::before{animation-name:svc-draw-y!important}}
+@keyframes svc-draw-y{from{transform:scaleY(0)}}
+
+/* --- Existing glass blocks on the service pages: entrances + hover ------- */
+/* Hosting status panel: lamps switch on one after another. */
+html.scroll-reveals .status-panel.in .status-led{animation:svc-led 700ms var(--ease-out) both!important}
+html.scroll-reveals .status-panel.in .status-item:nth-child(1) .status-led{animation-delay:250ms!important}
+html.scroll-reveals .status-panel.in .status-item:nth-child(2) .status-led{animation-delay:450ms!important}
+html.scroll-reveals .status-panel.in .status-item:nth-child(3) .status-led{animation-delay:650ms!important}
+@keyframes svc-led{0%{opacity:.25;transform:scale(.7);box-shadow:0 0 0 0 rgba(0,217,163,0)}60%{opacity:1;transform:scale(1.15);box-shadow:0 0 0 9px rgba(0,217,163,.18)}100%{}}
+.status-item{transition:background-color 400ms var(--ease-smooth)}
+/* SEO terminal: each line types in from the left, then its check appears. */
+html.scroll-reveals .terminal-panel.in .terminal-line{animation:svc-type 620ms var(--ease-out) both!important}
+html.scroll-reveals .terminal-panel.in .terminal-line .t-check{animation:svc-pop 380ms var(--ease-out) both!important}
+html.scroll-reveals .terminal-panel.in .terminal-line:nth-child(1),html.scroll-reveals .terminal-panel.in .terminal-line:nth-child(1) .t-check{animation-delay:150ms!important}
+html.scroll-reveals .terminal-panel.in .terminal-line:nth-child(2){animation-delay:330ms!important}
+html.scroll-reveals .terminal-panel.in .terminal-line:nth-child(3){animation-delay:510ms!important}
+html.scroll-reveals .terminal-panel.in .terminal-line:nth-child(4){animation-delay:690ms!important}
+html.scroll-reveals .terminal-panel.in .terminal-line:nth-child(1) .t-check{animation-delay:620ms!important}
+html.scroll-reveals .terminal-panel.in .terminal-line:nth-child(2) .t-check{animation-delay:800ms!important}
+html.scroll-reveals .terminal-panel.in .terminal-line:nth-child(3) .t-check{animation-delay:980ms!important}
+html.scroll-reveals .terminal-panel.in .terminal-line:nth-child(4) .t-check{animation-delay:1160ms!important}
+@keyframes svc-type{from{clip-path:inset(0 100% 0 0);opacity:.4}}
+.terminal-line{transition:background-color 400ms var(--ease-smooth)}
+/* Responsive rows: rows rise in turn, icons settle in. */
+html.scroll-reveals .device-rows.in .device-row{animation:svc-rise 560ms var(--ease-out) both!important}
+html.scroll-reveals .device-rows.in .device-row:nth-child(2){animation-delay:80ms!important}
+html.scroll-reveals .device-rows.in .device-row:nth-child(3){animation-delay:160ms!important}
+html.scroll-reveals .device-rows.in .device-row-icon{animation:svc-pop 520ms var(--ease-out) both!important}
+html.scroll-reveals .device-rows.in .device-row:nth-child(1) .device-row-icon{animation-delay:150ms!important}
+html.scroll-reveals .device-rows.in .device-row:nth-child(2) .device-row-icon{animation-delay:230ms!important}
+html.scroll-reveals .device-rows.in .device-row:nth-child(3) .device-row-icon{animation-delay:310ms!important}
+.device-row,.device-row-icon{transition:border-color 450ms var(--ease-smooth),translate 550ms var(--ease-smooth),rotate 550ms var(--ease-smooth),background-color 450ms var(--ease-smooth)}
+/* Izrada sajtova: checklist ticks draw in. */
+html.scroll-reveals .practice-list.in .practice-icon{animation:svc-pop 420ms var(--ease-out) both!important}
+html.scroll-reveals .practice-list.in li:nth-child(1) .practice-icon{animation-delay:200ms!important}
+html.scroll-reveals .practice-list.in li:nth-child(2) .practice-icon{animation-delay:340ms!important}
+html.scroll-reveals .practice-list.in li:nth-child(3) .practice-icon{animation-delay:480ms!important}
+html.scroll-reveals .feature-grid .feature-card.in .feature-num{animation:svc-rise 500ms var(--ease-out) 150ms both!important}
+
+/* Entrances must finish even when decorative motion is paused/static. */
+.motion-paused :is(.screen-check,.duty-split,.seo-timeline,.status-panel,.terminal-panel,.device-rows,.practice-list,.feature-card) *,
+.motion-paused :is(.screen-check,.seo-timeline)::before{animation-play-state:running!important}
+.motion-paused .seo-timeline::before{animation-play-state:running!important}
+
+/* Hover (mouse only). */
+@media (hover:hover) and (pointer:fine){
+  .status-item:hover,.terminal-line:hover{background:rgba(0,217,163,.05)}
+  .device-row:hover{border-color:rgba(0,217,163,.35);translate:4px 0}
+  .device-row:hover .device-row-icon{rotate:-4deg;translate:0 -2px;background:rgba(0,217,163,.14)}
+  .duty-col:hover{border-color:rgba(0,217,163,.3)}
+  .practice-list li:hover .practice-icon{background:rgba(0,217,163,.22)}
+}
+
+@media(prefers-reduced-motion:reduce){
+  html.scroll-reveals.scroll-reveals.scroll-reveals.scroll-reveals.scroll-reveals.scroll-reveals :is(.screen-check,.duty-split,.seo-timeline,.status-panel,.terminal-panel,.device-rows,.practice-list,.feature-grid) *,
+  html.scroll-reveals.scroll-reveals.scroll-reveals.scroll-reveals.scroll-reveals.scroll-reveals .seo-timeline::before{animation:none!important}
+  .device-row:hover,.device-row:hover .device-row-icon,.screen-list li:hover{translate:none;rotate:none}
+}
+@media(max-width:760px){.seo-timeline::before{left:34px}}

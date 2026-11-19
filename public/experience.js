@@ -345,6 +345,17 @@ document.querySelectorAll('.btn,.nav-cta').forEach(btn=>{
  btn.addEventListener('pointerleave',e=>{if(e.pointerType!=='mouse')return;place(e);btn.classList.remove('fill-on');});
 });
 
+// Service pages: glass blocks get a border light that follows the mouse.
+document.querySelectorAll('.feature-card,.status-panel,.terminal-panel,.device-row,.hero-visual,.screen-check,.duty-col,.seo-timeline,.practice-list,.related-item').forEach(block=>{
+ if(block.closest('[data-page="index.html"]')&&!block.closest('.feature-grid'))return;
+ block.classList.add('glass-edge');
+ block.addEventListener('pointermove',e=>{
+  if(e.pointerType!=='mouse'||reduce.matches)return;
+  const r=block.getBoundingClientRect();
+  block.style.setProperty('--px',(e.clientX-r.left).toFixed(0)+'px');block.style.setProperty('--py',(e.clientY-r.top).toFixed(0)+'px');
+ },{passive:true});
+});
+
 // Portfolio page: the project preview responds to the mouse with depth.
 // The desktop screenshot leans a little, the phone moves further (parallax),
 // and a soft light follows the cursor. Eased per frame; mouse only.
