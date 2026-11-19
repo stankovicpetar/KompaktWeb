@@ -345,6 +345,30 @@ document.querySelectorAll('.btn,.nav-cta').forEach(btn=>{
  btn.addEventListener('pointerleave',e=>{if(e.pointerType!=='mouse')return;place(e);btn.classList.remove('fill-on');});
 });
 
+// Portfolio page: the project preview responds to the mouse with depth.
+// The desktop screenshot leans a little, the phone moves further (parallax),
+// and a soft light follows the cursor. Eased per frame; mouse only.
+document.querySelectorAll('.project-visual').forEach(visual=>{
+ const desk=visual.querySelector('.device-desktop'),phone=visual.querySelector('.device-mobile');
+ if(!desk)return;
+ let tx=0,ty=0,x=0,y=0,raf=0;
+ const step=()=>{
+  raf=0;x+=(tx-x)*.1;y+=(ty-y)*.1;
+  const rest=!tx&&!ty&&Math.abs(x)+Math.abs(y)<.002;
+  desk.style.transform=rest?'':`translate3d(${(x*-10).toFixed(2)}px,${(y*-8).toFixed(2)}px,0) rotateX(${(y*-4).toFixed(2)}deg) rotateY(${(x*5).toFixed(2)}deg)`;
+  if(phone)phone.style.transform=rest?'':`translate3d(${(x*18).toFixed(2)}px,${(y*14).toFixed(2)}px,0) rotate(${(x*2).toFixed(2)}deg)`;
+  if(Math.abs(tx-x)+Math.abs(ty-y)>.002)raf=requestAnimationFrame(step);
+ };
+ visual.addEventListener('pointermove',e=>{
+  if(e.pointerType!=='mouse'||reduce.matches||userPaused)return;
+  const r=visual.getBoundingClientRect();
+  tx=(e.clientX-r.left)/r.width-.5;ty=(e.clientY-r.top)/r.height-.5;
+  visual.style.setProperty('--px',(e.clientX-r.left).toFixed(0)+'px');visual.style.setProperty('--py',(e.clientY-r.top).toFixed(0)+'px');
+  visual.classList.add('is-live');if(!raf)raf=requestAnimationFrame(step);
+ },{passive:true});
+ visual.addEventListener('pointerleave',()=>{tx=0;ty=0;visual.classList.remove('is-live');if(!raf)raf=requestAnimationFrame(step);});
+});
+
 // FAQ accordion: animate height on open and close; interruptible mid-way.
 const faqEase='cubic-bezier(.23,1,.32,1)';
 document.querySelectorAll('.faq-list details').forEach(details=>{

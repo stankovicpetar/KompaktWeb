@@ -962,5 +962,59 @@ html.scroll-reveals .plans .plan.reveal{transition:opacity 500ms var(--ease-smoo
    little less side padding so the 300px minimum fits; on very narrow screens
    the inline script falls back to the compact size. */
 .cf-turnstile{width:100%;min-height:65px;margin:4px 0 6px}
-.cf-turnstile iframe{width:100%!important;border-radius:8px}
 @media(max-width:600px){.form{padding:24px 14px}}
+
+/* ==========================================================================
+   Round 10: Turnstile fit, glass popup, portfolio project card.
+   ========================================================================== */
+
+/* Turnstile: leave the widget's own frame alone (an override cut its right
+   edge on desktop). On phones the contact area gets a little more width so
+   the full-width widget's 300px minimum fits from 360px-wide screens up. */
+.cf-turnstile{overflow:visible;max-width:100%}
+@media(max-width:600px){
+  #kontakt>.wrap{padding-left:12px;padding-right:12px}
+  .form{padding:24px 14px}
+}
+
+/* Offer popup: a glass sheet over a dimmed, softly blurred page. It
+   materialises (blur + scale + fade) instead of only fading. */
+.offer-dialog{
+  background:linear-gradient(180deg,rgba(40,50,60,.72),rgba(16,20,28,.82));
+  -webkit-backdrop-filter:blur(26px) saturate(160%);backdrop-filter:blur(26px) saturate(160%);
+  border:1px solid rgba(242,239,232,.14);border-radius:24px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 0 0 1px rgba(0,217,163,.08),0 40px 100px -30px rgba(0,0,0,.75);
+  filter:blur(6px);transition:opacity 280ms var(--ease-out),transform 360ms var(--ease-smooth),filter 320ms var(--ease-out)}
+.offer-dialog::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;
+  background:radial-gradient(90% 55% at 100% 0%,rgba(0,217,163,.2),transparent 65%),radial-gradient(60% 45% at 0% 100%,rgba(255,182,72,.08),transparent 70%)}
+.offer-dialog.visible{filter:none}
+.offer-dialog::backdrop{background:rgba(8,13,22,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.performance-static .offer-dialog::backdrop{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(8,13,22,.78)}
+.offer-dialog .offer-close{border-radius:50%;width:36px;height:36px;right:12px;top:12px;font-size:22px;background:rgba(242,239,232,.06);transition:background-color 300ms var(--ease-smooth),color 300ms var(--ease-smooth)}
+.offer-dialog .offer-close:hover{background:rgba(0,217,163,.14);color:var(--paper)}
+.offer-dialog .btn{border-radius:12px}
+@media(prefers-reduced-motion:reduce){.offer-dialog{filter:none!important}}
+@media(prefers-reduced-transparency:reduce){.offer-dialog{-webkit-backdrop-filter:none;backdrop-filter:none;background:#171c26}.offer-dialog::backdrop{backdrop-filter:none}}
+
+/* Portfolio page: rounded glass project card with an interactive preview. */
+[data-page="projekti"] .project-visual{border-radius:22px;border:1px solid rgba(242,239,232,.11);isolation:isolate;
+  background:radial-gradient(90% 70% at 85% 10%,rgba(0,217,163,.16),transparent 60%),linear-gradient(180deg,rgba(38,46,58,.62),rgba(23,28,38,.5));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 34px 70px -44px var(--shadow-tint);perspective:1000px;transition:border-color 500ms var(--ease-smooth)}
+[data-page="projekti"] .project-visual::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:6;opacity:0;
+  background:radial-gradient(320px circle at var(--px) var(--py),rgba(0,217,163,.14),transparent 70%);transition:opacity 500ms var(--ease-smooth)}
+[data-page="projekti"] .project-visual.is-live{border-color:rgba(0,217,163,.32)}
+[data-page="projekti"] .project-visual.is-live::after{opacity:1}
+[data-page="projekti"] .project-tag{border-radius:999px;padding:6px 12px;background:rgba(16,20,28,.72)}
+[data-page="projekti"] .device-desktop{border-radius:10px;overflow:hidden;will-change:transform}
+[data-page="projekti"] .device-mobile{will-change:transform}
+
+/* Buttons sit apart instead of touching; full width and stacked on phones. */
+.project-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:6px}
+@media(max-width:600px){.project-actions{flex-direction:column}.project-actions .btn{width:100%;justify-content:center}}
+@media(prefers-reduced-motion:reduce){[data-page="projekti"] .device-desktop,[data-page="projekti"] .device-mobile{transform:none!important}}
+
+/* Old price: a diagonal strike, so the line through "1" cannot read as "4". */
+.offer-price del{position:relative;text-decoration:none}
+.offer-price del::after{content:"";position:absolute;left:-6%;right:-6%;top:50%;height:2px;background:var(--paper-dim);border-radius:2px;transform:rotate(-14deg);transform-origin:center}
+.launch-offer .offer-price del::after{transform:rotate(-14deg);transform-origin:center}
+@keyframes offer-strike{from{transform:rotate(-14deg) scaleX(0)}to{transform:rotate(-14deg) scaleX(1)}}
