@@ -252,34 +252,86 @@ if(offerCard&&'IntersectionObserver'in window){
  offerIo.observe(offerCard);
 }
 
-// Packages and offer: the border lights up where the pointer is (mouse only).
+// Offer card: the border lights up where the pointer is (mouse only).
 // --px/--py are registered in CSS, so the light glides between positions.
-document.querySelectorAll('.plan,.launch-offer,.responsive-lab').forEach(card=>{
- card.addEventListener('pointermove',e=>{
-  if(e.pointerType!=='mouse'||reduce.matches)return;
-  const r=card.getBoundingClientRect();
-  card.style.setProperty('--px',(e.clientX-r.left).toFixed(0)+'px');card.style.setProperty('--py',(e.clientY-r.top).toFixed(0)+'px');
- },{passive:true});
-});
+const offerEdge=document.querySelector('.launch-offer');
+offerEdge?.addEventListener('pointermove',e=>{
+ if(e.pointerType!=='mouse'||reduce.matches)return;
+ const r=offerEdge.getBoundingClientRect();
+ offerEdge.style.setProperty('--px',(e.clientX-r.left).toFixed(0)+'px');offerEdge.style.setProperty('--py',(e.clientY-r.top).toFixed(0)+'px');
+},{passive:true});
 
-// Responsive lab: on hover the demo device tilts gently toward the pointer.
-// The transform is set on the device itself and eased each frame.
+// One shared mouse position, read once per frame by the pointer effects below.
+const mouse={x:null,y:null};const mouseSubscribers=new Set();let mouseRaf=0;
+window.addEventListener('pointermove',e=>{
+ if(e.pointerType!=='mouse')return;mouse.x=e.clientX;mouse.y=e.clientY;
+ if(!mouseRaf)mouseRaf=requestAnimationFrame(()=>{mouseRaf=0;mouseSubscribers.forEach(fn=>fn());});
+},{passive:true});
+document.documentElement.addEventListener('pointerleave',()=>{mouse.x=null;mouse.y=null;mouseSubscribers.forEach(fn=>fn());});
+const pointerFxAllowed=()=>finePointer.matches&&!reduce.matches&&!userPaused;
+
+// Packages: hover is decided from each card's layout box (offsetLeft/Top ignore
+// the lift), so a lifted card never slides out from under the cursor and flickers.
+const plansGrid=document.querySelector('.plans');
+if(plansGrid){
+ const cards=[...plansGrid.querySelectorAll('.plan')];let current=null,inView=false;
+ const update=()=>{
+  let hit=null;
+  if(inView&&pointerFxAllowed()&&mouse.x!==null){
+   const base=plansGrid.offsetParent?.getBoundingClientRect();
+   if(base)for(const c of cards){
+    const l=base.left+c.offsetLeft,t=base.top+c.offsetTop;
+    if(mouse.x>=l&&mouse.x<=l+c.offsetWidth&&mouse.y>=t&&mouse.y<=t+c.offsetHeight){
+     hit=c;c.style.setProperty('--px',(mouse.x-l).toFixed(0)+'px');c.style.setProperty('--py',(mouse.y-t).toFixed(0)+'px');break;
+    }
+   }
+  }
+  if(hit!==current){current?.classList.remove('is-hover');hit?.classList.add('is-hover');current=hit;plansGrid.classList.toggle('has-hover',!!hit);}
+ };
+ mouseSubscribers.add(update);window.addEventListener('scroll',update,{passive:true});
+ if('IntersectionObserver'in window)new IntersectionObserver(e=>{inView=e[0].isIntersecting;update();}).observe(plansGrid);else inView=true;
+}
+
+// Responsive lab: like "Niste sigurni", it reacts to the mouse while it is on
+// screen, even before the cursor reaches it. The border light moves to the
+// nearest edge and the demo device leans toward the cursor, eased per frame.
 const lab=document.querySelector('.responsive-lab'),labDevice=lab?.querySelector('.demo-device');
 if(lab&&labDevice){
- let tx=0,ty=0,x=0,y=0,raf=0;
+ let tx=0,ty=0,x=0,y=0,raf=0,inView=false;
+ const clamp=v=>Math.max(-1,Math.min(1,v));
  const step=()=>{
-  x+=(tx-x)*.1;y+=(ty-y)*.1;
-  labDevice.style.transform=Math.abs(x)+Math.abs(y)<.01&&!tx&&!ty?'':`rotateX(${y.toFixed(2)}deg) rotateY(${x.toFixed(2)}deg) translateZ(0)`;
-  raf=Math.abs(tx-x)+Math.abs(ty-y)>.01?requestAnimationFrame(step):0;
+  raf=0;x+=(tx-x)*.09;y+=(ty-y)*.09;
+  const resting=Math.abs(x)+Math.abs(y)<.01&&!tx&&!ty;
+  labDevice.style.transform=resting?'':`rotateX(${y.toFixed(2)}deg) rotateY(${x.toFixed(2)}deg) translateZ(0)`;
+  if(Math.abs(tx-x)+Math.abs(ty-y)>.01)raf=requestAnimationFrame(step);
  };
- lab.addEventListener('pointermove',e=>{
-  if(e.pointerType!=='mouse'||reduce.matches||userPaused)return;
-  const r=lab.getBoundingClientRect();
-  tx=((e.clientX-r.left)/r.width-.5)*14;ty=-((e.clientY-r.top)/r.height-.5)*10;
+ const update=()=>{
+  const live=inView&&pointerFxAllowed()&&mouse.x!==null;
+  lab.classList.toggle('lab-live',live);
+  if(live){
+   const r=lab.getBoundingClientRect();
+   lab.style.setProperty('--px',(mouse.x-r.left).toFixed(0)+'px');lab.style.setProperty('--py',(mouse.y-r.top).toFixed(0)+'px');
+   const nx=clamp((mouse.x-(r.left+r.width/2))/(r.width*.75)),ny=clamp((mouse.y-(r.top+r.height/2))/(r.height*.75));
+   tx=nx*12;ty=-ny*9;
+  }else{tx=0;ty=0;}
   if(!raf)raf=requestAnimationFrame(step);
- },{passive:true});
- lab.addEventListener('pointerleave',()=>{tx=0;ty=0;if(!raf)raf=requestAnimationFrame(step);});
+ };
+ mouseSubscribers.add(update);window.addEventListener('scroll',update,{passive:true});
+ if('IntersectionObserver'in window)new IntersectionObserver(e=>{inView=e[0].isIntersecting;update();},{rootMargin:'120px 0px'}).observe(lab);else inView=true;
+ toggle?.addEventListener('click',update);
 }
+
+// Buttons: the hover fill grows from the side the mouse came in and shrinks
+// toward the side it leaves. Mouse only; touch keeps the press feedback.
+document.querySelectorAll('.btn,.nav-cta').forEach(btn=>{
+ const place=e=>{
+  const r=btn.getBoundingClientRect();
+  btn.style.setProperty('--bx',(e.clientX-r.left).toFixed(0)+'px');btn.style.setProperty('--by',(e.clientY-r.top).toFixed(0)+'px');
+  btn.style.setProperty('--br',Math.ceil(Math.hypot(r.width,r.height))+'px');
+ };
+ btn.addEventListener('pointerenter',e=>{if(e.pointerType!=='mouse')return;place(e);requestAnimationFrame(()=>btn.classList.add('fill-on'));});
+ btn.addEventListener('pointerleave',e=>{if(e.pointerType!=='mouse')return;place(e);btn.classList.remove('fill-on');});
+});
 
 // FAQ accordion: animate height on open and close; interruptible mid-way.
 const faqEase='cubic-bezier(.23,1,.32,1)';
