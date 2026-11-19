@@ -827,3 +827,62 @@ html.scroll-reveals .plans .plan.reveal{transition:opacity 500ms var(--ease-smoo
   .btn.fill-on::before,.nav-cta.fill-on::before{opacity:1}
   .plans .plan.is-hover{translate:none}
 }
+
+/* ==========================================================================
+   Round 7: performance and the edge-light colour flash.
+   ========================================================================== */
+
+/* 1. Grain: the fixed, full-screen layer with mix-blend-mode had to be
+   re-blended over the whole viewport on every scroll frame. The same grain
+   now sits in the page background and scrolls with it (painted once). */
+body::after{content:none;display:none}
+body{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .035 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-repeat:repeat}
+
+/* 2. Glass without live blur. The colour fields behind the cards are already
+   soft gradients, so blurring them changed almost nothing visually but cost a
+   full re-blur of every card on every scroll frame. The look stays: frosted
+   translucent fill, bright top edge, soft depth. Only the fixed header keeps
+   a real blur, because page content actually scrolls under it. */
+.plan,.plan.featured,.responsive-lab,.work-preview,.launch-offer,.form,
+[data-page="index.html"] #projekti .wrap::before{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+.plan,.responsive-lab,.work-preview,.form,[data-page="index.html"] #projekti .wrap::before{
+  background:linear-gradient(180deg,rgba(38,46,58,.62),rgba(23,28,38,.5))}
+.plan.featured{background:linear-gradient(180deg,rgba(14,58,50,.62),rgba(20,32,36,.5) 55%,rgba(23,28,38,.5))}
+.launch-offer{background:linear-gradient(120deg,rgba(14,58,50,.6),rgba(30,38,48,.52) 55%,rgba(23,28,38,.5))}
+@media (hover:hover) and (pointer:fine){
+  .plans .plan:hover{background-image:linear-gradient(180deg,rgba(38,46,58,.62),rgba(23,28,38,.5))}
+  .plans .plan.featured:hover{background-image:linear-gradient(180deg,rgba(14,58,50,.62),rgba(20,32,36,.5) 55%,rgba(23,28,38,.5))}
+  .plans .plan.is-hover{background-image:radial-gradient(360px circle at var(--px) var(--py),rgba(0,217,163,.13),transparent 70%),linear-gradient(180deg,rgba(44,53,66,.66),rgba(26,32,42,.54))}
+  .plans .plan.featured.is-hover{background-image:radial-gradient(360px circle at var(--px) var(--py),rgba(0,217,163,.18),transparent 70%),linear-gradient(180deg,rgba(14,64,55,.66),rgba(20,34,38,.54) 55%,rgba(23,28,38,.5))}
+}
+/* The header blur is skipped on low-power devices (static mode). */
+.performance-static header{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(16,20,28,.94)}
+
+/* 3. Hover depth without animating big blurred shadows (each frame of a
+   box-shadow transition repaints the whole card area). Cards keep a fixed
+   shadow; hover changes lift, border and edge light only. */
+@media (hover:hover) and (pointer:fine){
+  .plans .plan.is-hover,.plans .plan.featured.is-hover{box-shadow:var(--glass-shadow)}
+  .responsive-lab.lab-live,.work-preview:hover,.responsive-lab:hover{box-shadow:var(--glass-shadow)}
+  .btn-primary:hover{box-shadow:0 10px 26px -12px rgba(0,217,163,.55)}
+}
+html.scroll-reveals .plans .plan.reveal{transition:opacity 500ms var(--ease-smooth),transform var(--dur-reveal) var(--ease-out),translate 650ms var(--ease-smooth),border-color 600ms var(--ease-smooth)!important;
+  transition-delay:0ms,var(--reveal-delay,0ms),0ms,0ms!important}
+.responsive-lab{transition:border-color 600ms var(--ease-smooth)}
+.btn,.nav-cta,.plan-btn{transition:background-color 520ms var(--ease-smooth),border-color 520ms var(--ease-smooth),color 520ms var(--ease-smooth),transform 600ms var(--ease-smooth)}
+
+/* 4. Edge light: no sliding in from the left. The position used to glide in
+   from its off-screen start value, which showed as a lighter streak along the
+   left edge each time a card was entered. It now appears where the mouse is,
+   fades in only through opacity, and uses the brand green throughout. */
+.plan::after,.launch-offer::before,.responsive-lab::after{transition:opacity 500ms var(--ease-smooth)!important}
+.plan::after{background:radial-gradient(260px circle at var(--px) var(--py),rgba(0,217,163,.95),rgba(0,217,163,.35) 35%,transparent 65%)}
+.responsive-lab::after{background:radial-gradient(280px circle at var(--px) var(--py),rgba(0,217,163,.9),rgba(0,217,163,.3) 35%,transparent 70%)}
+.launch-offer::before{background:radial-gradient(260px circle at var(--px) var(--py),rgba(0,217,163,.95),rgba(0,217,163,.35) 35%,transparent 65%)}
+.launch-offer:not(:hover)::before{transition-duration:300ms!important}
+/* Primary button hover fill stays in the brand green instead of a pale wash. */
+.btn-primary::before,.plan.featured .plan-btn::before{background:#3ff2c4}
+
+/* 5. Decorative layers do not need the main thread or repaints. */
+.orbit{will-change:transform}
+.scroll-progress{will-change:transform}

@@ -59,7 +59,13 @@ const reveals=document.querySelectorAll('.reveal');
 if(!reduce.matches&&'IntersectionObserver'in window){const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:0,rootMargin:'0px 0px -32px 0px'});reveals.forEach(e=>io.observe(e));}else reveals.forEach(e=>e.classList.add('in'));
 const progress=document.createElement('div');progress.className='scroll-progress';document.body.append(progress);
 let scrollQueued=false;
-function scrollUpdate(){const d=document.documentElement;progress.style.transform=`scaleX(${d.scrollHeight>d.clientHeight?d.scrollTop/(d.scrollHeight-d.clientHeight):0})`;document.querySelector('header')?.style.setProperty('border-bottom-color',scrollY>10?'#00d9a340':'#f2efe817');scrollQueued=false;}
+// Page height is cached (updated on resize and when the body changes size) and
+// the header colour is written only when it changes, not on every scroll frame.
+const headerEl=document.querySelector('header');let scrollRange=1,headerScrolled=null;
+const measureScroll=()=>{const d=document.documentElement;scrollRange=Math.max(1,d.scrollHeight-d.clientHeight);};
+measureScroll();window.addEventListener('resize',measureScroll,{passive:true});window.addEventListener('load',measureScroll);
+if('ResizeObserver'in window)new ResizeObserver(measureScroll).observe(document.body);
+function scrollUpdate(){progress.style.transform=`scaleX(${Math.min(1,scrollY/scrollRange)})`;const scrolled=scrollY>10;if(scrolled!==headerScrolled){headerScrolled=scrolled;headerEl?.style.setProperty('border-bottom-color',scrolled?'#00d9a340':'#f2efe817');}scrollQueued=false;}
 window.addEventListener('scroll',()=>{if(!scrollQueued){requestAnimationFrame(scrollUpdate);scrollQueued=true;}},{passive:true});scrollUpdate();
 // Animate once, on entering view. Keep the final value available to screen readers.
 const counts=document.querySelectorAll('[data-count]');
@@ -219,12 +225,15 @@ if(build){
 const callout=document.querySelector('[data-page="index.html"] #projekti .wrap');
 const finePointer=window.matchMedia('(hover: hover) and (pointer: fine)');
 if(callout){
- let px=null,py=null,x=null,y=null,raf=0,inView=false;
+ let px=null,py=null,x=null,y=null,raf=0,inView=false,insetL=0,insetR=0;
+ // The light layer's insets are read once per resize, not every frame.
+ const readInsets=()=>{const b=getComputedStyle(callout,'::after');insetL=parseFloat(b.left)||0;insetR=parseFloat(b.right)||0;};
+ readInsets();window.addEventListener('resize',readInsets,{passive:true});
  const enabled=()=>inView&&finePointer.matches&&!reduce.matches&&!userPaused;
  const step=()=>{
   raf=0;if(!enabled()){callout.classList.remove('glow-on');return;}
-  const box=getComputedStyle(callout,'::after'),r=callout.getBoundingClientRect();
-  const left=r.left+(parseFloat(box.left)||0),w=r.width-(parseFloat(box.left)||0)-(parseFloat(box.right)||0);
+  const r=callout.getBoundingClientRect();
+  const left=r.left+insetL,w=r.width-insetL-insetR;
   // Before the first pointer move, rest the light near the top right of the box.
   const tx=px===null?w*.82:px-left,ty=py===null?r.height*.15:py-r.top;
   if(x===null){x=tx;y=ty;}
@@ -269,6 +278,9 @@ window.addEventListener('pointermove',e=>{
 },{passive:true});
 document.documentElement.addEventListener('pointerleave',()=>{mouse.x=null;mouse.y=null;mouseSubscribers.forEach(fn=>fn());});
 const pointerFxAllowed=()=>finePointer.matches&&!reduce.matches&&!userPaused;
+// Scrolling re-runs the pointer effects through the same once-per-frame queue.
+const queuePointerFx=()=>{if(!mouseRaf)mouseRaf=requestAnimationFrame(()=>{mouseRaf=0;mouseSubscribers.forEach(fn=>fn());});};
+window.addEventListener('scroll',queuePointerFx,{passive:true});
 
 // Packages: hover is decided from each card's layout box (offsetLeft/Top ignore
 // the lift), so a lifted card never slides out from under the cursor and flickers.
@@ -288,7 +300,7 @@ if(plansGrid){
   }
   if(hit!==current){current?.classList.remove('is-hover');hit?.classList.add('is-hover');current=hit;plansGrid.classList.toggle('has-hover',!!hit);}
  };
- mouseSubscribers.add(update);window.addEventListener('scroll',update,{passive:true});
+ mouseSubscribers.add(update);
  if('IntersectionObserver'in window)new IntersectionObserver(e=>{inView=e[0].isIntersecting;update();}).observe(plansGrid);else inView=true;
 }
 
@@ -316,7 +328,7 @@ if(lab&&labDevice){
   }else{tx=0;ty=0;}
   if(!raf)raf=requestAnimationFrame(step);
  };
- mouseSubscribers.add(update);window.addEventListener('scroll',update,{passive:true});
+ mouseSubscribers.add(update);
  if('IntersectionObserver'in window)new IntersectionObserver(e=>{inView=e[0].isIntersecting;update();},{rootMargin:'120px 0px'}).observe(lab);else inView=true;
  toggle?.addEventListener('click',update);
 }
