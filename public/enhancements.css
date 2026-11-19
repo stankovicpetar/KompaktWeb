@@ -931,3 +931,36 @@ html.scroll-reveals .plans .plan.reveal{transition:opacity 500ms var(--ease-smoo
     .field select::picker(select){-webkit-backdrop-filter:none;backdrop-filter:none;background:#171c26}
   }
 }
+
+/* ==========================================================================
+   Round 9: green lives inside the boxes; wide Turnstile in the form.
+   ========================================================================== */
+
+/* On narrow screens the section colour fields turned into a narrow vertical
+   band above the lab and the form. They are dropped there; the green now sits
+   inside the boxes on every screen. */
+@media(max-width:900px){
+  [data-page="index.html"] #iskustvo::before,[data-page="index.html"] #projekti::before,[data-page="index.html"] .featured-work::before,
+  [data-page="index.html"] #akcija::before,[data-page="index.html"] #kontakt::before,[data-page="index.html"] #paketi::before{display:none}
+}
+
+/* A soft resting glow inside the responsive lab and "Niste sigurni", visible
+   without a mouse; on desktop the pointer light moves on top of it. */
+.responsive-lab{background:
+  radial-gradient(110% 65% at 92% 0%,rgba(0,217,163,.17),transparent 62%),
+  radial-gradient(70% 55% at 0% 100%,rgba(0,217,163,.08),transparent 70%),
+  linear-gradient(180deg,rgba(38,46,58,.62),rgba(23,28,38,.5))}
+[data-page="index.html"] #projekti .wrap::before{background:
+  radial-gradient(70% 120% at 100% 0%,rgba(0,217,163,.16),transparent 60%),
+  radial-gradient(50% 90% at 0% 100%,rgba(0,217,163,.07),transparent 70%),
+  linear-gradient(180deg,rgba(38,46,58,.62),rgba(23,28,38,.5))}
+.form{background:
+  radial-gradient(90% 50% at 100% 0%,rgba(0,217,163,.08),transparent 65%),
+  linear-gradient(180deg,rgba(38,46,58,.62),rgba(23,28,38,.5))}
+
+/* Turnstile: full-width (flexible) widget that fills the form. Phones get a
+   little less side padding so the 300px minimum fits; on very narrow screens
+   the inline script falls back to the compact size. */
+.cf-turnstile{width:100%;min-height:65px;margin:4px 0 6px}
+.cf-turnstile iframe{width:100%!important;border-radius:8px}
+@media(max-width:600px){.form{padding:24px 14px}}
