@@ -213,27 +213,32 @@ if(build){
  document.addEventListener('visibilitychange',buildSync);
 }
 
-// "Niste sigurni" callout: a soft light follows the pointer with a little lag,
-// so it glides instead of sticking to the cursor. Real pointers only.
+// "Niste sigurni" callout: its only light follows the pointer wherever it is on
+// the page while the box is in view, with a little lag so it glides. Real
+// pointers only; off for reduced motion and when animations are paused.
 const callout=document.querySelector('[data-page="index.html"] #projekti .wrap');
 const finePointer=window.matchMedia('(hover: hover) and (pointer: fine)');
 if(callout){
- let tx=0,ty=0,x=0,y=0,raf=0,active=false;
+ let px=null,py=null,x=null,y=null,raf=0,inView=false;
+ const enabled=()=>inView&&finePointer.matches&&!reduce.matches&&!userPaused;
  const step=()=>{
-  x+=(tx-x)*.14;y+=(ty-y)*.14;
+  raf=0;if(!enabled()){callout.classList.remove('glow-on');return;}
+  const box=getComputedStyle(callout,'::after'),r=callout.getBoundingClientRect();
+  const left=r.left+(parseFloat(box.left)||0),w=r.width-(parseFloat(box.left)||0)-(parseFloat(box.right)||0);
+  // Before the first pointer move, rest the light near the top right of the box.
+  const tx=px===null?w*.82:px-left,ty=py===null?r.height*.15:py-r.top;
+  if(x===null){x=tx;y=ty;}
+  x+=(tx-x)*.12;y+=(ty-y)*.12;
   callout.style.setProperty('--mx',x.toFixed(1)+'px');callout.style.setProperty('--my',y.toFixed(1)+'px');
-  raf=(active||Math.abs(tx-x)+Math.abs(ty-y)>.5)?requestAnimationFrame(step):0;
+  callout.classList.add('glow-on');
+  if(Math.abs(tx-x)+Math.abs(ty-y)>.3)raf=requestAnimationFrame(step);
  };
- const target=e=>{
-  const r=callout.getBoundingClientRect(),inset=parseFloat(getComputedStyle(callout,'::after').left)||0;
-  tx=e.clientX-r.left-inset;ty=e.clientY-r.top;
- };
- callout.addEventListener('pointerenter',e=>{
-  if(!finePointer.matches||reduce.matches||userPaused)return;
-  target(e);if(!active){x=tx;y=ty;}active=true;callout.classList.add('glow-on');if(!raf)raf=requestAnimationFrame(step);
- });
- callout.addEventListener('pointermove',e=>{if(active)target(e);});
- callout.addEventListener('pointerleave',()=>{active=false;callout.classList.remove('glow-on');});
+ const kick=()=>{if(!raf)raf=requestAnimationFrame(step);};
+ window.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'&&e.pointerType!=='pen')return;px=e.clientX;py=e.clientY;if(inView)kick();},{passive:true});
+ window.addEventListener('scroll',()=>{if(inView)kick();},{passive:true});
+ if('IntersectionObserver'in window)new IntersectionObserver(e=>{inView=e[0].isIntersecting;kick();},{rootMargin:'200px 0px'}).observe(callout);
+ else{inView=true;kick();}
+ finePointer.addEventListener?.('change',kick);reduce.addEventListener('change',kick);toggle?.addEventListener('click',kick);
 }
 
 // FAQ accordion: animate height on open and close; interruptible mid-way.
