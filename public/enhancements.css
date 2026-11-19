@@ -886,3 +886,48 @@ html.scroll-reveals .plans .plan.reveal{transition:opacity 500ms var(--ease-smoo
 /* 5. Decorative layers do not need the main thread or repaints. */
 .orbit{will-change:transform}
 .scroll-progress{will-change:transform}
+
+/* ==========================================================================
+   Round 8: the form's package dropdown matches the glass style.
+   Same native <select> (name, values and preselection unchanged).
+   Browsers with customizable selects (Chrome, Edge, Android) get the glass
+   popup; others keep their native list in the site's dark colours.
+   ========================================================================== */
+.field select option{background-color:#171c26;color:var(--paper)}
+
+@supports (appearance:base-select){
+  .field select,.field select::picker(select){appearance:base-select}
+  .field select{display:flex;align-items:center;justify-content:space-between;gap:12px;background-image:none;cursor:pointer;
+    color:var(--paper);font:400 15.5px/1.4 var(--body)}
+  .field select::picker-icon{content:'';width:10px;height:6px;flex-shrink:0;background:var(--signal);
+    clip-path:polygon(0 0,100% 0,50% 100%);transition:rotate 320ms var(--ease-smooth)}
+  .field select:open{border-color:var(--signal);box-shadow:0 0 0 3px var(--glow)}
+  .field select:open::picker-icon{rotate:180deg}
+
+  /* The popup: frosted glass, light top edge, soft depth. It is small and
+     only open briefly, so a real backdrop blur is affordable here. */
+  .field select::picker(select){margin-top:8px;padding:6px;min-width:anchor-size(width);
+    border:1px solid rgba(242,239,232,.13);border-radius:14px;color:var(--paper);
+    background:linear-gradient(180deg,rgba(38,46,58,.78),rgba(18,23,31,.86));
+    -webkit-backdrop-filter:blur(22px) saturate(150%);backdrop-filter:blur(22px) saturate(150%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 28px 60px -22px rgba(0,0,0,.7),0 0 0 1px rgba(0,217,163,.06);
+    transform-origin:top center;opacity:1;translate:0 0;scale:1;
+    transition:opacity 220ms var(--ease-out),translate 280ms var(--ease-smooth),scale 280ms var(--ease-smooth),display 280ms allow-discrete,overlay 280ms allow-discrete}
+  .field select:not(:open)::picker(select){opacity:0;translate:0 -6px;scale:.98}
+  @starting-style{.field select:open::picker(select){opacity:0;translate:0 -6px;scale:.98}}
+
+  .field select option{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:9px;background:transparent;
+    color:var(--paper-dim);font:400 15px/1.35 var(--body);cursor:pointer;transition:background-color 240ms var(--ease-smooth),color 240ms var(--ease-smooth)}
+  .field select option:hover,.field select option:focus-visible{background:rgba(0,217,163,.12);color:var(--paper);outline:none}
+  .field select option:checked{color:var(--signal);font-weight:500}
+  .field select option::checkmark{order:1;margin-left:auto;color:var(--signal);font-size:13px}
+  .field select option+option{margin-top:2px}
+
+  @media(prefers-reduced-motion:reduce){
+    .field select::picker(select),.field select::picker-icon{transition:opacity 150ms ease}
+    .field select:not(:open)::picker(select){translate:none;scale:none}
+  }
+  @media(prefers-reduced-transparency:reduce){
+    .field select::picker(select){-webkit-backdrop-filter:none;backdrop-filter:none;background:#171c26}
+  }
+}
