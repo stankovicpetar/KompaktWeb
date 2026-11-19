@@ -241,6 +241,27 @@ if(callout){
  finePointer.addEventListener?.('change',kick);reduce.addEventListener('change',kick);toggle?.addEventListener('click',kick);
 }
 
+// 80 € offer: one entrance when the card comes into view (strike, price, sheen).
+// Light CSS, so it also plays in static mode; skipped when paused or reduced.
+const offerCard=document.querySelector('.launch-offer');
+if(offerCard&&'IntersectionObserver'in window){
+ const offerIo=new IntersectionObserver(entries=>{
+  if(!entries[0].isIntersecting)return;offerIo.disconnect();
+  if(!userPaused&&!reduce.matches)offerCard.classList.add('offer-play');
+ },{threshold:.35});
+ offerIo.observe(offerCard);
+}
+
+// Packages and offer: the border lights up where the pointer is (mouse only).
+// --px/--py are registered in CSS, so the light glides between positions.
+document.querySelectorAll('.plan,.launch-offer').forEach(card=>{
+ card.addEventListener('pointermove',e=>{
+  if(e.pointerType!=='mouse'||reduce.matches)return;
+  const r=card.getBoundingClientRect();
+  card.style.setProperty('--px',(e.clientX-r.left).toFixed(0)+'px');card.style.setProperty('--py',(e.clientY-r.top).toFixed(0)+'px');
+ },{passive:true});
+});
+
 // FAQ accordion: animate height on open and close; interruptible mid-way.
 const faqEase='cubic-bezier(.23,1,.32,1)';
 document.querySelectorAll('.faq-list details').forEach(details=>{

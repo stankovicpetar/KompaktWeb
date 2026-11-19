@@ -608,3 +608,80 @@ html.scroll-reveals .hero-art.reveal.in{transform:none}
   background:radial-gradient(460px circle at var(--mx,80%) var(--my,15%),rgba(0,217,163,.22),rgba(0,217,163,.07) 42%,transparent 70%);
   transition:opacity 700ms var(--ease-smooth)}
 @media(max-width:600px){[data-page="index.html"] #projekti .wrap::after{inset:0 22px}}
+
+/* ==========================================================================
+   Round 4: offer entrance, smoother links and buttons, glass package cards.
+   ========================================================================== */
+@property --px{syntax:'<length>';inherits:true;initial-value:-400px}
+@property --py{syntax:'<length>';inherits:true;initial-value:-400px}
+
+/* Buttons and links: slower, softer easing in both directions. */
+.btn,.nav-cta,.plan-btn{transition:background-color 520ms var(--ease-smooth),border-color 520ms var(--ease-smooth),color 520ms var(--ease-smooth),box-shadow 600ms var(--ease-smooth),transform 600ms var(--ease-smooth)}
+.btn-arrow,.text-link span,.work-arrow{transition:transform 600ms var(--ease-smooth)!important}
+.btn.btn:active,.nav-cta.nav-cta:active,.plan-btn.plan-btn:active{transition-duration:140ms}
+.nav-links a,.dropdown-trigger,.footer-navigation a,.footer-links a,.breadcrumbs a,.contact-detail a,.text-link,.flags a,.faq-list summary{transition:color 450ms var(--ease-smooth),border-color 450ms var(--ease-smooth),background-color 450ms var(--ease-smooth),opacity 450ms var(--ease-smooth)!important}
+.nav-links a::after{transition:transform 560ms var(--ease-smooth)!important}
+.dropdown-menu li a{transition:background-color 400ms var(--ease-smooth),color 400ms var(--ease-smooth)}
+.dropdown-trigger .caret{transition:transform 420ms var(--ease-smooth)}
+
+/* Packages: separate glass cards with rounded corners on every screen.
+   A soft colour field sits behind them so the frosted glass reads. */
+[data-page="index.html"] #paketi{overflow:clip}
+[data-page="index.html"] #paketi::before{content:'';position:absolute;inset:18% 0 4%;pointer-events:none;
+  background:radial-gradient(38% 46% at 22% 42%,rgba(0,217,163,.17),transparent 70%),radial-gradient(30% 40% at 78% 72%,rgba(255,182,72,.10),transparent 70%),radial-gradient(30% 36% at 58% 18%,rgba(0,217,163,.08),transparent 70%)}
+[data-page="index.html"] #paketi .wrap{position:relative;z-index:1}
+.plans{gap:18px;background:none;border:0;border-radius:0;overflow:visible;box-shadow:none}
+.plan,.plan.featured{position:relative;border-radius:24px;overflow:hidden;isolation:isolate;
+  background:linear-gradient(180deg,rgba(242,239,232,.075),rgba(242,239,232,.025));
+  -webkit-backdrop-filter:blur(20px) saturate(150%);backdrop-filter:blur(20px) saturate(150%);
+  border:1px solid rgba(242,239,232,.10);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),inset 0 -1px 0 rgba(255,255,255,.03),0 30px 60px -40px var(--shadow-tint)}
+.plan.featured{background:linear-gradient(180deg,rgba(0,217,163,.14),rgba(0,217,163,.03) 55%,rgba(242,239,232,.02));border-color:rgba(0,217,163,.45)}
+.plan.featured::before{border-radius:0 0 0 12px;z-index:2}
+.plan:hover{background:linear-gradient(180deg,rgba(242,239,232,.10),rgba(242,239,232,.035))}
+.plan.featured:hover{background:linear-gradient(180deg,rgba(0,217,163,.18),rgba(0,217,163,.04) 55%,rgba(242,239,232,.02))}
+/* Edge light that follows the pointer around the border. */
+.plan::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;z-index:1;opacity:0;
+  background:radial-gradient(220px circle at var(--px) var(--py),rgba(0,217,163,.95),rgba(0,217,163,.25) 40%,transparent 70%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
+  transition:opacity 600ms var(--ease-smooth),--px 220ms var(--ease-out),--py 220ms var(--ease-out)}
+/* Lift on hover without disturbing the scroll-reveal stagger. */
+html.scroll-reveals .plans .plan.reveal{transition:opacity var(--dur-reveal) var(--ease-out),transform var(--dur-reveal) var(--ease-out),translate 600ms var(--ease-smooth),background 600ms var(--ease-smooth),border-color 600ms var(--ease-smooth),box-shadow 600ms var(--ease-smooth)!important;
+  transition-delay:var(--reveal-delay,0ms),var(--reveal-delay,0ms),0ms,0ms,0ms,0ms!important}
+@media (hover:hover) and (pointer:fine){
+  .plan:hover::after{opacity:1}
+  .plans .plan:hover{translate:0 -6px;border-color:rgba(242,239,232,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 40px 70px -40px rgba(0,217,163,.35)}
+}
+@media(max-width:720px){.plans{gap:16px}.plan,.plan.featured{border-radius:20px}}
+
+/* 80 € offer: price strike draws on, the new price rises in, a light sheen
+   crosses the card once, and the button arrives last. Plays once. */
+.launch-offer{position:relative;overflow:hidden;isolation:isolate}
+.launch-offer>*{position:relative;z-index:1}
+.launch-offer::after{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;
+  background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.09) 48%,rgba(0,217,163,.10) 52%,transparent 70%);transform:translateX(-100%)}
+.launch-offer .offer-price del{position:relative;text-decoration:none}
+.launch-offer .offer-price del::after{content:'';position:absolute;left:-4%;right:-4%;top:52%;height:2px;background:var(--paper-dim);border-radius:2px;transform-origin:left}
+.launch-offer .offer-price strong{display:inline-block}
+.launch-offer.offer-play::after{animation:offer-sheen 1500ms var(--ease-in-out) 450ms both!important}
+.launch-offer.offer-play .offer-price del::after{animation:offer-strike 520ms var(--ease-out) 650ms both!important}
+.launch-offer.offer-play .offer-price strong{animation:offer-price 700ms var(--ease-out) 900ms both!important}
+.launch-offer.offer-play .offer-action .btn{animation:offer-rise 560ms var(--ease-out) 1250ms both!important}
+.launch-offer.offer-play .offer-spots{animation:offer-rise 520ms var(--ease-out) 300ms both!important}
+.motion-paused .launch-offer.offer-play *,.motion-paused .launch-offer.offer-play::after,.motion-paused .launch-offer.offer-play *::after{animation-play-state:running!important}
+@keyframes offer-sheen{0%{opacity:1;transform:translateX(-100%)}100%{opacity:1;transform:translateX(100%)}}
+@keyframes offer-strike{from{transform:scaleX(0)}}
+@keyframes offer-price{from{opacity:0;transform:translateY(14px) scale(.94);filter:blur(6px)}}
+@keyframes offer-rise{from{opacity:0;transform:translateY(10px)}}
+/* Offer edge light on hover, like the packages. */
+.launch-offer::before{content:'';position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;z-index:2;opacity:0;
+  background:radial-gradient(260px circle at var(--px) var(--py),rgba(242,239,232,.9),rgba(0,217,163,.4) 40%,transparent 70%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
+  transition:opacity 600ms var(--ease-smooth),--px 220ms var(--ease-out),--py 220ms var(--ease-out)}
+@media (hover:hover) and (pointer:fine){.launch-offer:hover::before{opacity:1}}
+
+@media(prefers-reduced-motion:reduce){
+  .launch-offer.offer-play *,.launch-offer.offer-play::after{animation:none!important}
+  .plans .plan:hover{translate:none}
+  .plan::after,.launch-offer::before{transition:opacity 200ms ease}
+}
