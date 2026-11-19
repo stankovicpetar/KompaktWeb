@@ -513,3 +513,71 @@ html.scroll-reveals .hero-art.reveal.in{transform:none}
 .performance-static .faq-list details.closing>p{animation:none!important;transition:opacity 160ms ease,transform 200ms var(--ease-out)!important}
 .performance-static .faq-list summary::before{transition:transform 220ms var(--ease-out),opacity 220ms ease!important}
 @media(prefers-reduced-motion:reduce){.performance-static .faq-list details[open]>p{animation:fade-only 160ms ease both!important}}
+
+/* ==========================================================================
+   Round 2: scrollbar, flags, phone packages, callout glow, portfolio hover.
+   ========================================================================== */
+
+/* Scrollbar in brand colours. Chromium and Safari get a rounded thumb that
+   turns green on hover; Firefox gets the matching thin colours. */
+::-webkit-scrollbar{width:12px;height:12px}
+::-webkit-scrollbar-track{background:var(--ink)}
+::-webkit-scrollbar-thumb{background:#36494d;border:3px solid var(--ink);border-radius:999px}
+::-webkit-scrollbar-thumb:hover{background:#00d9a3b3}
+::-webkit-scrollbar-thumb:active{background:var(--signal)}
+::-webkit-scrollbar-corner{background:var(--ink)}
+@supports (-moz-appearance:none){html,.nav-links.mobile-open,.offer-dialog{scrollbar-width:thin;scrollbar-color:#36494d var(--ink)}}
+
+/* Language flags: rounded, with the outline sitting directly on the flag.
+   The tap target stays large through an invisible hit area. */
+.language-switch.flags{gap:10px}
+.language-switch.flags a{position:relative;display:block;width:auto;height:auto;padding:0;border:0;border-radius:5px;background:none!important;opacity:.55;transition:opacity 200ms ease}
+.language-switch.flags a::before{content:'';position:absolute;inset:-12px -5px}
+.language-switch.flags img{display:block;width:27px;height:18px;object-fit:cover;border-radius:5px;transition:box-shadow 200ms ease}
+.language-switch.flags a:hover,.language-switch.flags a[aria-current=page]{opacity:1}
+.language-switch.flags a:hover img{box-shadow:0 0 0 2px #00d9a380}
+.language-switch.flags a[aria-current=page] img{box-shadow:0 0 0 2px var(--signal)}
+.language-switch.flags a:focus-visible{outline:2px solid var(--signal);outline-offset:3px}
+@media(max-width:600px){
+  .language-switch.flags{gap:9px}
+  .language-switch.flags img{width:25px;height:17px;border-radius:4px}
+  .language-switch.flags a{border-radius:4px}
+}
+
+/* Packages on phones: separate rounded cards instead of one joined table. */
+@media(max-width:720px){
+  .plans{gap:16px;background:none;border:0;border-radius:0;overflow:visible;box-shadow:none}
+  .plan{border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 24px 50px -36px var(--shadow-tint)}
+  .plan.featured{border-color:var(--signal);box-shadow:0 24px 60px -34px rgba(0,217,163,.45)}
+  .plan.featured::before{border-radius:0 0 0 10px}
+}
+
+/* "Niste sigurni": a soft green light follows the pointer (desktop only). */
+[data-page="index.html"] #projekti .wrap::after{content:'';position:absolute;inset:0 32px;border-radius:var(--r-lg);pointer-events:none;opacity:0;
+  background:radial-gradient(380px circle at var(--mx,80%) var(--my,0%),rgba(0,217,163,.2),rgba(0,217,163,.06) 45%,transparent 70%);
+  transition:opacity 500ms var(--ease-out)}
+[data-page="index.html"] #projekti .wrap.glow-on::after{opacity:1}
+[data-page="index.html"] #projekti .wrap.glow-on::before{border-color:#00d9a338;transition:border-color 500ms ease}
+
+/* Portfolio hover: one slow, smooth move. The card lights up, the desktop
+   view rises and settles, the phone straightens and floats forward. */
+.work-preview{position:relative}
+.work-preview::after{content:'';position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;opacity:0;
+  box-shadow:inset 0 0 0 1px #00d9a366,0 40px 90px -50px rgba(0,217,163,.5);transition:opacity 650ms var(--ease-out)}
+.work-image>img{transform:translateY(14px);transition:transform 900ms cubic-bezier(.22,1,.36,1)!important}
+.work-phone{transform:rotate(4deg);transition:transform 900ms cubic-bezier(.22,1,.36,1) 60ms!important}
+.work-arrow{transition:transform 600ms cubic-bezier(.22,1,.36,1)!important}
+.work-preview:hover .work-image>img{transform:translateY(14px)}
+.work-preview:hover .work-phone{transform:rotate(4deg)}
+.work-preview:hover .work-arrow{transform:none}
+@media (hover:hover) and (pointer:fine){
+  .work-preview:hover::after{opacity:1}
+  .work-preview:hover .work-image>img{transform:translateY(2px) scale(1.012)}
+  .work-preview:hover .work-phone{transform:rotate(-1.5deg) translate(-8px,-16px)}
+  .work-preview:hover .work-arrow{transform:translate(4px,-4px)}
+}
+@media(prefers-reduced-motion:reduce){
+  .work-image>img,.work-phone,.work-preview:hover .work-image>img,.work-preview:hover .work-phone{transform:none!important;transition:none!important}
+  .work-preview::after{transition:opacity 200ms ease}
+  [data-page="index.html"] #projekti .wrap::after{display:none}
+}

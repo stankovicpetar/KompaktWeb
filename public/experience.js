@@ -213,6 +213,29 @@ if(build){
  document.addEventListener('visibilitychange',buildSync);
 }
 
+// "Niste sigurni" callout: a soft light follows the pointer with a little lag,
+// so it glides instead of sticking to the cursor. Real pointers only.
+const callout=document.querySelector('[data-page="index.html"] #projekti .wrap');
+const finePointer=window.matchMedia('(hover: hover) and (pointer: fine)');
+if(callout){
+ let tx=0,ty=0,x=0,y=0,raf=0,active=false;
+ const step=()=>{
+  x+=(tx-x)*.14;y+=(ty-y)*.14;
+  callout.style.setProperty('--mx',x.toFixed(1)+'px');callout.style.setProperty('--my',y.toFixed(1)+'px');
+  raf=(active||Math.abs(tx-x)+Math.abs(ty-y)>.5)?requestAnimationFrame(step):0;
+ };
+ const target=e=>{
+  const r=callout.getBoundingClientRect(),inset=parseFloat(getComputedStyle(callout,'::after').left)||0;
+  tx=e.clientX-r.left-inset;ty=e.clientY-r.top;
+ };
+ callout.addEventListener('pointerenter',e=>{
+  if(!finePointer.matches||reduce.matches||userPaused)return;
+  target(e);if(!active){x=tx;y=ty;}active=true;callout.classList.add('glow-on');if(!raf)raf=requestAnimationFrame(step);
+ });
+ callout.addEventListener('pointermove',e=>{if(active)target(e);});
+ callout.addEventListener('pointerleave',()=>{active=false;callout.classList.remove('glow-on');});
+}
+
 // FAQ accordion: animate height on open and close; interruptible mid-way.
 const faqEase='cubic-bezier(.23,1,.32,1)';
 document.querySelectorAll('.faq-list details').forEach(details=>{
